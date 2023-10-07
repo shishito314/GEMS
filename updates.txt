@@ -1,0 +1,1 @@
+Updates: Working on the current reading, a bit confused on how it's done in the GEMSv1 code.
