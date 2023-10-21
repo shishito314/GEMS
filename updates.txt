@@ -1,1 +1,1 @@
-Updates: Working on the current reading, a bit confused on how it's done in the GEMSv1 code.
+Updates: Got current reading working, trying to figure out the calculation to get that to the actual H2O or O2 measurements.
