@@ -1,1 +1,2 @@
-Updates: Got current reading working, trying to figure out the calculation to get that to the actual H2O or O2 measurements.
+State: Have Oxygen and Temperature Reading working
+Todo: Add another display for Oxygen/H2O, create better communication system with nano/uno, do smoothing on sensor readings
