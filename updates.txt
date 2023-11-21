@@ -1,2 +1,2 @@
-State: Have Oxygen and Temperature Reading working
-Todo: Add another display for Oxygen/H2O, create better communication system with nano/uno, do smoothing on sensor readings
+State: Have Oxygen and Temperature Reading working, and using polling system for bluetooth communication
+Todo: Add another display for Oxygen/H2O, do smoothing on sensor readings
