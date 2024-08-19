@@ -1,3 +1,0 @@
-State: Have Oxygen and Temperature Reading working, and using polling system for bluetooth communication
-Todo: Add another display for Oxygen/H2O, do smoothing on sensor readings
-Notes: For some reason the bluetooth modules don't like to send doubles
