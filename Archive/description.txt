@@ -1,1 +1,0 @@
-The folder here is just to separate the older code (e.g. from Bluetooth versions) from the current code. It might still be helpful to have some of it around, so I'm keeping the files but just putting them here.
