@@ -1,0 +1,340 @@
+(footprint "YAG_MF25_YAG"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(tags "MFP-25BRD52-220R ")
+	(property "Reference" "REF**"
+		(at 5.842 0 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "c57ec97b-2c24-42eb-a533-87302f083ca7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "YAG_MF25_YAG"
+		(at 5.842 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "48ee29c6-9f5c-44cd-881b-e2a4d3a40495")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "f72b8fd2-67d0-48ac-a655-f9b11c1ea734")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6b1494f0-a2f2-4775-be3d-8f6da7bce0e9")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "575d1c64-62ca-4450-adf8-755d7edf3287")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_line
+		(start 2.3114 -1.4351)
+		(end 2.3114 1.4351)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "2c11e6c4-b277-45af-98d4-1f98cada84e8")
+	)
+	(fp_line
+		(start 2.3114 1.4351)
+		(end 9.3726 1.4351)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "e93730f4-2238-4910-9ad6-4dcb5da7d949")
+	)
+	(fp_line
+		(start 9.3726 -1.4351)
+		(end 2.3114 -1.4351)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "042e424a-9733-4e82-8f0d-b10981b5b6c7")
+	)
+	(fp_line
+		(start 9.3726 1.4351)
+		(end 9.3726 -1.4351)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "bdbb4b13-83ec-436a-9f68-0580d597469a")
+	)
+	(fp_line
+		(start -0.9398 -0.9398)
+		(end 2.1844 -0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "ead587d6-632f-4f0f-8b6d-3bf693b0a671")
+	)
+	(fp_line
+		(start -0.9398 0.9398)
+		(end -0.9398 -0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "72276c14-08c3-419a-bad0-3f38163d14c9")
+	)
+	(fp_line
+		(start 2.1844 -1.5621)
+		(end 9.4996 -1.5621)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "b745cc2b-e61f-4faa-8c73-570147ebd402")
+	)
+	(fp_line
+		(start 2.1844 -0.9398)
+		(end 2.1844 -1.5621)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "751c52a8-5d62-496a-bb60-940c297a34c7")
+	)
+	(fp_line
+		(start 2.1844 0.9398)
+		(end -0.9398 0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "4f022b42-9c71-47c3-99df-6a76c9e88762")
+	)
+	(fp_line
+		(start 2.1844 1.5621)
+		(end 2.1844 0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "bcf7fffc-9074-43d8-91a1-caa253e785b1")
+	)
+	(fp_line
+		(start 9.4996 -1.5621)
+		(end 9.4996 -0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "f9d6f535-c010-4bf6-afc7-68b4244b0942")
+	)
+	(fp_line
+		(start 9.4996 -0.9398)
+		(end 12.6238 -0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "fb8993d4-7545-4238-b08c-ef2649a9f3f9")
+	)
+	(fp_line
+		(start 9.4996 0.9398)
+		(end 9.4996 1.5621)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "4474953d-647b-4799-a218-1674343dc14b")
+	)
+	(fp_line
+		(start 9.4996 1.5621)
+		(end 2.1844 1.5621)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "27f82262-106b-4b3b-b178-143886ea2649")
+	)
+	(fp_line
+		(start 12.6238 -0.9398)
+		(end 12.6238 0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "6e982f27-df38-45c5-bf45-b7963365ffc3")
+	)
+	(fp_line
+		(start 12.6238 0.9398)
+		(end 9.4996 0.9398)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "66195ebd-9bbb-473f-aaa2-8fab635433fe")
+	)
+	(fp_line
+		(start 0 0)
+		(end 2.4384 0)
+		(stroke
+			(width 0.0254)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "5d3450c3-a9a9-4ba2-b7a0-92fd23459467")
+	)
+	(fp_line
+		(start 2.4384 -1.3081)
+		(end 2.4384 1.3081)
+		(stroke
+			(width 0.0254)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "8f1e23bf-89b5-4505-a888-826240ad03a9")
+	)
+	(fp_line
+		(start 2.4384 1.3081)
+		(end 9.2456 1.3081)
+		(stroke
+			(width 0.0254)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "dcdc61a9-10d7-4abe-bd97-e37a366cc0f8")
+	)
+	(fp_line
+		(start 9.2456 -1.3081)
+		(end 2.4384 -1.3081)
+		(stroke
+			(width 0.0254)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "87d160db-88b9-4a34-8811-45455b4da3f0")
+	)
+	(fp_line
+		(start 9.2456 1.3081)
+		(end 9.2456 -1.3081)
+		(stroke
+			(width 0.0254)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "7609f05e-2344-4632-87aa-b83c9242570a")
+	)
+	(fp_line
+		(start 11.684 0)
+		(end 9.2456 0)
+		(stroke
+			(width 0.0254)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "9d009e2b-6cda-4c20-a483-141a10e152b1")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 5.842 0 0)
+		(unlocked yes)
+		(layer "B.SilkS")
+		(uuid "ac43c68e-14df-4bae-aaef-a53f8158bb47")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify mirror)
+		)
+	)
+	(fp_text user "${REFERENCE}"
+		(at 5.842 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "865b9a3a-014f-419e-8b87-2f35a974ce77")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole rect
+		(at 0 0)
+		(size 1.3716 1.3716)
+		(drill 0.8636)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "dcd97741-64c6-420b-8e69-fa4fb77299d0")
+	)
+	(pad "2" thru_hole circle
+		(at 11.684 0)
+		(size 1.3716 1.3716)
+		(drill 0.8636)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "ba04b2c2-9ec9-40d1-9af9-dbfa5ff6fef5")
+	)
+	(model "/Users/caseychiang/Downloads/MFP_25BRD52_220R/YAG_MF25_YAG.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
