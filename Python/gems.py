@@ -9,12 +9,11 @@ import datetime # for getting the time
 import os # for checking file existence
 
 # -------------------- Constants (Must Match Arduino) --------------------
-
 # Note: for text parsing, flags must contain no spaces
 TEMP_FLAG = "Temp:" # For text parsing, sending data, and logs.                               MUST MATCH ARDUINO
 OXY_FLAG = "Oxy:" # For text parsing, sending data, and logs.                                 MUST MATCH ARDUINO
 WATER_FLAG = "Water:" # For text parsing, sending data, and logs.                             MUST MATCH ARDUINO
-LOG_FLAGS = [TEMP_FLAG, OXY_FLAG, WATER_FLAG] # For log file parsing (Used in data.py)
+LOG_FLAGS = [TEMP_FLAG, OXY_FLAG, WATER_FLAG] # For log file parsing (Used in data.py)        NO MATCH
 # ^ LOG_FLAGS doesn't need a corresponding arduino constant, but should contain all the flags for the sensors (like the ones above)
 
 # For Caching
@@ -35,7 +34,7 @@ END_FLAG = "End" # An end flag used for text parsing                            
 DATETIME_STR_LENGTH = 21 # How to trim the datetime string for the desired precision.
 # 19 is second precision, 21 is tenth second, 22 hundredth, and so on.
 
-CYCLE_TIMING = 15 # Timing between sending http requests and updating display values
+CYCLE_TIMING = 5 # Timing between sending http requests and updating display values
 # (may be different than logging cycle, which depends on the caching cycle time in the arduino code)
 HTTP_WAIT_TIME = CYCLE_TIMING / 3 # max wait should be this x3 - in box arduino, out of box arduino, out of box arduino (for displays)
 
@@ -78,7 +77,7 @@ OFFSCALE_LOW_MSSG = "LOW" # Used internally to record offscale low
 HTTP_REQUEST_FAIL = "Request Failed" # Used internally for detecting failed HTTP request
 
 # ---------- SHOULD NOT CHANGE ----------
-CONFIG_FILE = "config.txt" # Name for the config file
+CONFIG_FILE = "config" # Name for the config file
 INTERNAL_DIR = ".internal" # Keeps track of timestamps so they persist between executions of the python script
 ERROR_LOG_FILE = "errorLog" # Name for the error log file
 LOG_FILE_PREFIX = "log_"
@@ -459,7 +458,6 @@ class Arduino:
       
       internalFile.write(arduinoTimeStr + "\n")
 
-      # print(log)
       for i in range(0, len(self.sensors)):
         if not self.sensors[i].flag in log: continue
         val = readFromUntil(log, self.sensors[i].flag, END_FLAG)
@@ -493,7 +491,6 @@ class Glovebox:
         line += (" " + sensor.flag + " " + data[sensor.flag])
     while(line[len(line) - 1] == " "): # Remove unecessary trailing spaces
       line = line[0:len(line) - 1]
-      # print("in")
     line += "\n"
     return line
 
@@ -519,12 +516,7 @@ class Glovebox:
     if (not self.lastLogTime): # using a saved self.lastLogTime variable so we don't have to reopen the file every time
       self.getLastLogTime(logFileName)
 
-    # TODO: NOTE: CASE WITH ORDER CHANGING IS UNTESTED
-    # print()
-    # print(allNewData)
     if (allNewData[0][CACHE_TIME_FLAG] < self.lastLogTime): # need to change order
-      # print(allNewData[0][CACHE_TIME_FLAG])
-      # print(self.lastLogTime)
       logFile = open(logFileName, "r")
       logFileStr = logFile.read()
       logFile.close()
@@ -533,10 +525,8 @@ class Glovebox:
       prevLines = []
       index = len(lines) - 1
       while index >= 0:
-        # print(convertStrToDatetime(lines[index][0:DATETIME_STR_LENGTH]))
         if (convertStrToDatetime(lines[index][0:DATETIME_STR_LENGTH]) > allNewData[0][CACHE_TIME_FLAG]):
           prevLines.insert(0, lines[index])
-          # print("here")
           index -= 1
         else:
           break
@@ -566,7 +556,6 @@ class Glovebox:
       self.lastLogTime = allNewData[len(allNewData) - 1][CACHE_TIME_FLAG]
       logFile = open(logFileName, "a")
       for log in allNewData:
-        # print(len(allNewData))
         self.writeNewLogLine(logFile, log)
       logFile.close()
     
@@ -636,7 +625,7 @@ SENSOR_CONFIG_FLAG_TO_CLASS = {
 
 gloveboxes = [] # List of all gloveboxes
 gloveboxNames = [] # Names of all the gloveboxes, in identical order as the gloveboxes list (used for getGloveboxByName utility)
-configFile = open(CONFIG_FILE, "r")
+configFile = open(CONFIG_FILE + ".txt", "r")
 configFileStr = configFile.read()
 configFile.close()
 # File Parsing
