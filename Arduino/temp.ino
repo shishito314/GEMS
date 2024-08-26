@@ -20,8 +20,8 @@ constexpr char* END_FLAG = "End"; //                                            
 
 // -------------------- Other Constants --------------------
 // ---------- May Be Changed ----------
-constexpr char* NETWORK_SSID = "ChiangGroupWifi";  // your network SSID (name)
-constexpr char* NETWORK_PASS = "EVs4ALL!";  // your network password (using WPA)
+constexpr char NETWORK_SSID[] = [Insert Network Name Here];  // your network SSID (name)
+constexpr char NETWORK_PASS[] = [Insert Network Password Here];  // your network password (using WPA)
 
 // For Digital Filter (Moving Average)
 // Using a simpler moving average than the oxygen or water sensors, since the maximum sampling rate slower anyway
