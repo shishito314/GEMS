@@ -29,6 +29,8 @@ The GEMS Project Software is still in progress, which means not all features are
 
 Currently the logging system isn't fully working, and will sometimes log incorrectly. The arduino connected to the oxygen and water sensors will also sometimes stop working. (The problem needs testing, and could be a specific hardware issue with that arduino). If the display readouts stop updating, restart the arduino. (You can restart the arduino by pressing the reset button next to the USB port).
 
+The GEMS gui also does not work on the 4100 computer, although it works when tested on a macbook. It is untested on the other lab computers.
+
 ### [Python Code](./Python)
 
 The Python Code in this repository should go on the lab computer or a personal computer for interfacing with other python scripts. The gems.py, loop.py, and gui.py programs should go on the lab computer, and data.py can go on your personal computer (or the lab computer if you are writing python scripts there).
