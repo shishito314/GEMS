@@ -35,21 +35,15 @@ The Python Code in this repository should go on the lab computer or a personal c
 
 ### [Arduino Code](./Arduino)
 
-The Arduino Code in this repository are sketches to be uploaded to the arduino. For any of them, you will need to enter the correct network information before uploading (directions [here](#configuring-arduino-programs-with-network-information)). The latest versions are [oxyWaterDisplay.ino](./Arduino/oxyWaterDisplay.ino) and [temp.ino](./Arduino/temp.ino).
+The Arduino Code in this repository is the sketches to be uploaded to the arduino. For any of them, you will need to enter the correct network information before uploading (directions [here](#configuring-arduino-programs-with-network-information)). The latest versions are [oxyWaterDisplay.ino](./Arduino/oxyWaterDisplay.ino) and [temp.ino](./Arduino/temp.ino).
 
 ### [PCB Files](./PCB-Files)
 
-#### [For Editing](./PCB-Files/Editing)
-
-I used KiCad for designing the PCBs. The KiCad files can be found at this link.
-
-#### [For Ordering](./PCB-Files/Ordering)
-
-The files you need for ordering the PCBs can be found at this link, including gerber files, drill files, the bill of materials, and centroid files.
+I used KiCad for designing the PCBs. The KiCad editing files can be found [here](./PCB-Files/Editing), and the files needed for ordering PCBs can be found [here](./PCB-Files/Ordering). That includes the gerber and drill files, the bill of materials, and centroid files.
 
 ### [CAD Files](./CAD-Files)
 
-I used onshape for designing the CAD models. You can find the .step files for the CAD models at this link. A link to the onshape document is below the supplementary info section.
+I used onshape for designing the CAD models. You can find the 3d models for the CAD models at [this link](./CAD-Files). A link to the onshape document is below the supplementary info section.
 
 ## How GEMS works
 
