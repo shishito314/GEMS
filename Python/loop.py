@@ -11,8 +11,8 @@ import threading
 threading.Thread()
 
 # -------------------- Warning Prints --------------------
-print("\033[91m" + "This python console is running GEMS, the Glovebox Environmental Monitoring System." + "\033[00m")
-print("\033[91m" + "Please do not close this console unless you wish to stop the program" + "\033[00m")
+print("This python console is running GEMS, the Glovebox Environmental Monitoring System.")
+print("Please do not close this console unless you wish to stop the program")
 
 # -------------------- Main Run Loop --------------------
 initTime = time.time()
