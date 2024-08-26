@@ -1,7 +1,6 @@
 // For Wifi
 #include <SPI.h>
 #include <WiFiNINA.h>
-// #include "arduino_secrets.h"
 // For Displays
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -29,8 +28,8 @@ constexpr char* END_FLAG = "End"; //                                            
 
 // -------------------- Other Constants --------------------
 // ---------- May Be Changed ----------
-constexpr char* NETWORK_SSID = "ChiangGroupWifi";  // your network SSID (name)
-constexpr char* NETWORK_PASS = "EVs4ALL!";  // your network password (using WPA)
+constexpr char NETWORK_SSID[] = [Insert Network Name Here];  // your network SSID (name)
+constexpr char NETWORK_PASS[] = [Insert Network Password Here];  // your network password (using WPA)
 // For Readouts On Disconnect
 constexpr uint16_t DISPLAY_REQUEST_WAIT = 8000;  // how long to wait for the HTTP request before changing to on-arduino calculation + readout
 constexpr uint16_t DISPLAY_REFRESH_RATE = 250;
@@ -50,8 +49,8 @@ constexpr double SENSE_RESISTANCE = 220; // The resistance used for calculating 
 constexpr double VOLT_REF = 5;
 
 // Analog Reading Pins
-constexpr uint8_t OXY_PIN = A3; // The analog pin connected to the Oxygen Sensor
-constexpr uint8_t WATER_PIN = A2; // The same, for the water sensor
+constexpr uint8_t OXY_PIN = A0; // The analog pin connected to the Oxygen Sensor
+constexpr uint8_t WATER_PIN = A1; // The same, for the water sensor
 
 // For Digital Filter (Moving Average)
 constexpr uint8_t MEASUREMENT_DELAY = 0;  // as quick a sample rate as possible
@@ -87,7 +86,7 @@ uint32_t lastDisplayRequest = 0;
 uint32_t displayWaitMarker = 0;
 
 // For Wifi
-// int keyIndex = 0;           // your network key index number (needed only for WEP)
+// int keyIndex = 0; // your network key index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
 WiFiServer server(80);
