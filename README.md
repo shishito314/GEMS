@@ -3,63 +3,51 @@
 ## Table of Contents
 
 - [GEMS - Glovebox Environmental Monitoring System](#gems-glovebox-environmental-monitoring-system)
+  - [Table of Contents](#table-of-contents)
   - [About this Repository](#about-this-repository)
-    - [Python Code](#python-code)
-    - [Arduino Code](#arduino-code)
-    - [PCB Files](#pcb-files)
-      - [For Editing](#for-editing)
-      - [For Ordering](#for-ordering)
-    - [CAD Files](#cad-files)
   - [How GEMS works](#how-gems-works)
     - [Overview](#overview)
     - [Hardware](#hardware)
-      - [Bill Of Materials](#bill-of-materials)
-      - [Wifi Communications](#wifi-communications)
-      - [Sensor Measurement](#sensor-measurement)
     - [Software](#software)
-      - [gems.py](#gemspy)
-        - [Logging + Caching](#logging-caching)
-      - [loop.py](#looppy)
-      - [data.py](#datapy)
-      - [gui.py](#guipy)
-      - [Arduino Sensor Sketch](#arduino-sensor-sketch)
-        - [Wifi & Caching](#wifi-caching)
-        - [Smoothing](#smoothing)
-        - [Behavior on Disconnect](#behavior-on-disconnect)
-      - [Arduino Temp Sketch](#arduino-temp-sketch)
-      - [Get MAC Address Sketch](#get-mac-address-sketch)
   - [Instructions For Use](#instructions-for-use)
     - [Setup](#setup)
-    - [Binding Arduino MAC Adresses](#binding-arduino-mac-adresses)
+    - [Binding Arduino MAC Addresses](#binding-arduino-mac-addresses)
+    - [Configuring Arduino Programs With Network Information](#configuring-arduino-programs-with-network-information)
     - [Changing Display I2C Addresses](#changing-display-i2c-addresses)
     - [Python Configuration](#python-configuration)
-    - [Arduino Secrets File](#arduino-secrets-file)
     - [Adding Sensors:](#adding-sensors)
     - [Changing Program Constants and Parameters](#changing-program-constants-and-parameters)
-  - [Known Issues and Limitations](#known-issues-and-limitations)
   - [Supplementary Info & Links](#supplementary-info-links)
+  - [Known Issues and Limitations](#known-issues-and-limitations)
+  - [GEMS To-Do List](#gems-to-do-list)
 
 ## About this Repository
 
-### [Python Code](INSERT_GITHUB_LINK_HERE)
+### <p style="color:#ff3636">WARNING:</p>
 
-The Python Code in this repository has code that should go on the lab computer or a personal computer for interfacing with other python scripts. gems.py, loop.py, and gui.py should go on the lab computer, and data.py can go on your personal computer (or the lab computer if you are writing python scripts there).
+The GEMS Project Software is still in progress, which means not all features are in working order.
 
-### [Arduino Code](INSERT_GITHUB_LINK_HERE)
+Currently the logging system isn't fully working, and will sometimes log incorrectly. The arduino connected to the oxygen and water sensors will also sometimes stop working. (The problem needs testing, and could be a specific hardware issue with that arduino). If the display readouts stop updating, restart the arduino. (You can restart the arduino by pressing the reset button next to the USB port).
 
-The Arduino Code in this repository are sketches to be uploaded to the arduino. For any of them, you will also need an arduino_secrets.h file, which you can see how to construct [here](#arduino-secrets-file). The latest versions are [INSERT HERE] and [INSERT HERE].
+### [Python Code](./Python)
 
-### [PCB Files](INSERT_GITHUB_LINK_HERE)
+The Python Code in this repository should go on the lab computer or a personal computer for interfacing with other python scripts. The gems.py, loop.py, and gui.py programs should go on the lab computer, and data.py can go on your personal computer (or the lab computer if you are writing python scripts there).
 
-#### [For Editing](INSERT_GITHUB_LINK_HERE)
+### [Arduino Code](./Arduino)
+
+The Arduino Code in this repository are sketches to be uploaded to the arduino. For any of them, you will need to enter the correct network information before uploading (directions [here](#configuring-arduino-programs-with-network-information)). The latest versions are [oxyWaterDisplay.ino](./Arduino/oxyWaterDisplay.ino) and [temp.ino](./Arduino/temp.ino).
+
+### [PCB Files](./PCB-Files)
+
+#### [For Editing](./PCB-Files/Editing)
 
 I used KiCad for designing the PCBs. The KiCad files can be found at this link.
 
-#### [For Ordering](INSERT_GITHUB_LINK_HERE)
+#### [For Ordering](./PCB-Files/Ordering)
 
 The files you need for ordering the PCBs can be found at this link, including gerber files, drill files, the bill of materials, and centroid files.
 
-### [CAD Files](INSERT_GITHUB_LINK_HERE)
+### [CAD Files](./CAD-Files)
 
 I used onshape for designing the CAD models. You can find the .step files for the CAD models at this link. A link to the onshape document is below the supplementary info section.
 
@@ -77,7 +65,7 @@ Then, with the current measurements, the computer will decide what should be dis
 
 ### Hardware
 
-#### [Bill Of Materials]([INSERT_GITHUB_LINK_HERE])
+#### [Bill Of Materials]([https://docs.google.com/spreadsheets/d/1ikpGfJ6LjHaBAVGgCHs3OJ50SzMK_VNal6e07bsFQgU/edit?usp=sharing])
 
 #### Wifi Communications
 
@@ -114,7 +102,7 @@ There are some other pieces of harware that address a few problems:
 
 ### Software
 
-#### [gems.py]([INSERT_GITHUB_LINK_HERE])
+#### [gems.py](./Python/gems.py)
 
 gems.py is the file with all the architecture and setup for the GEMS system. Running it won't do much on it's own, but it's imported into the other files.
 
@@ -122,27 +110,33 @@ The way gems.py is designed, there are gloveboxes with a list of arduinos, and e
 
 ##### Logging + Caching
 
-#### [loop.py]([INSERT_GITHUB_LINK_HERE])
+#### [loop.py](./Python/loop.py)
 
 loop.py is the file that runs the GEMS system. It is what actually executes the code to make requests and logs. It is an inifinite loop, so you'll have to stop it by closing the python terminal.
 
-#### [data.py]([INSERT_GITHUB_LINK_HERE])
+#### [data.py](./Python/data.py)
 
 data.py is the file for getting data from the gems logs, so things like analysis and plotting can be achieved.
 
-#### [gui.py]([INSERT_GITHUB_LINK_HERE])
+#### [gui.py](./Python/gui.py)
 
 gui.py is the file that runs the GEMS GUI (graphical user interface). You can use it to check up on the GEMS system and measurements.
 
-#### [Arduino Sensor Sketch]([INSERT_GITHUB_LINK_HERE])
+Note: gui.py does not work on the 4100 windows 7 computer, but did work on macbook.
+
+#### [Arduino Sensor/Display Sketch](./Arduino/oxyWaterDisplay.ino)
 
 ##### Wifi & Caching
+
+The Arduino uses the WiFiNINA library for wifi functionality. When it gets an HTTP request from the lab computer, it will parse the information that comes with the request, and send an appropriate response. For text parsing, all the data sent by the lab computer or arduino is sent in between a corresponding text "flag," to identify what the data is, and a text "end flag," to identify where that information ends in the text.
+
+To avoid losing data in logs, the arduino holds the information it sent to the lab computer in a "cache." If it gets a message from the computer that the information was received successfully, it will clear the cache of already-sent data and only send the new, unsent data.
 
 ##### Smoothing
 
 Currently, the arduino takes measurements from the analog pins every loop cycle. It adds those measurements to an array for smoothing, and gets rid of the oldest measurement in the array. However, those measurements are not a single reading from the analog pin, but rather many readings averaged out to a single value. That way, a higher smoothing value could be achieved with the same amount of memory than by taking single measurements.
 
-For example, with 30 16-byte-integers worth of memory, you could either have an array with 30 measurements, or you could have an array of 15 averages of 15 measurements each. Therefore, the effective smoothing is with 225 values, not just 30.
+For example, with 30 16-byte-integers worth of memory, you could either have an array with 30 measurements, or you could have an array of 15 averages of some number of measurements. Since there's no need to hold the actual measurements in an array, as long as you have the average of all of them, the effective smoothing can be much higher, even than the 225 (15\*15) smoothing of holding all the measurements in memory.
 
 Also, the readings can be taken close together, since they are taken right after each other instead of waiting for another cycle of the arduino loop function.
 
@@ -150,11 +144,11 @@ Also, the readings can be taken close together, since they are taken right after
 
 When the display arduino gets disconnected, it will calculate the oxygen and humidity values locally and display those. It won't display the temperature, instead showing "dISC" for disconnected. It will keep caching new data for when it reconnects, though.
 
-#### [Arduino Temp Sketch]([INSERT_GITHUB_LINK_HERE])
+#### [Arduino Temp Sketch](./Arduino/temp.ino)
 
-This arduino program is essentially a more basic version of the [insert sensor arduino sketch file name here] sketch. It only has to deal with the wifi communications and temperature measuring, no displays.
+This arduino program is essentially a more basic version of the oxyWaterDisplay.ino sketch. It only has to deal with the wifi communications and temperature measuring, no displays.
 
-#### [Get MAC Address Sketch](INSERT_GITHUB_LINK_HERE)
+#### [Get MAC Address Sketch](./Arduino/getMacAddress.ino)
 
 The Get MAC Address sketch can be used to find the MAC address of the arduino. It will connect to the router wifi network, then print its MAC address in the Serial Monitor.
 
@@ -183,7 +177,7 @@ Here's the full setup you need for GEMS to work:
 - Router
   - Arduino MAC addresses bound to IP addresses listed in the configuration file
 
-### Binding Arduino MAC Adresses
+### Binding Arduino MAC Addresses
 
 1. Get the Arduino MAC address with the GetMacAddress Sketch
 2. Go to router configuration page
@@ -192,6 +186,22 @@ Here's the full setup you need for GEMS to work:
 5. Click "Address Reservation"
 6. Add a new line, and input the MAC Address with the desired IP Address
 7. Switch to "Enable"
+
+### Configuring Arduino Programs With Network Information
+
+Before uploading the arduino code to the arduino boards, you'll need to set them up with the correct network information. In the arduino programs, there should some lines that look like the following:
+
+```c++
+constexpr char NETWORK_SSID[] = [Insert Network Name Here];  // your network SSID (name)
+constexpr char NETWORK_PASS[] = [Insert Network Password Here];  // your network password (using WPA)
+```
+
+You'll need to replace the bracketed phrases with the appropriate network name and password, in quotes. For example, it could look something like this:
+
+```c++
+constexpr char NETWORK_SSID[] = "exampleNetwork";  // your network SSID (name)
+constexpr char NETWORK_PASS[] = "examplePassword";  // your network password (using WPA)
+```
 
 ### Changing Display I2C Addresses
 
@@ -208,22 +218,20 @@ Here's the format for a config file:
 
 ```
 Glovebox: [Name]
-Arduino: IP: [IP Adress] Display: [True/False] Sensors: [Sensor1 Sensor 2...]
-Arduino: IP: [IP Adress] Display: [True/False] Sensors: [Sensor 1 Sensor 2...]
+Arduino: IP: [IP Address] Display: [True/False] Sensors: [Sensor1 Sensor 2...]
+Arduino: IP: [IP Address] Display: [True/False] Sensors: [Sensor 1 Sensor 2...]
 Glovebox: [Name]
 [Arduinos...]
-.
-.
-.
+...
 ```
 
 Here's an example of a config file following that format:
 
 ```
-Glovebox: Pluto
+Glovebox: pluto
 Arduino: IP: 192.168.0.110 Display: True Sensors: Oxy Water
 Arduino: IP: 192.168.0.111 Display: False Sensors: Temp
-Glovebox: Venus
+Glovebox: neptune
 Arduino: IP: 192.168.0.112 Display: True Sensors: Oxy
 Arduino: IP: 192.168.0.113 Display: False Sensors: Temp
 ```
@@ -274,32 +282,31 @@ After making the sensor, class, add a corresponding configuration flag and senso
 
 When changing constants in the programs, it is important to note that variables labeled "MUST MATCH ARDUINO" or "MUST MATCH PYTHON" must be the same in both programs. They should be in dedicated sections of the files near the top.
 
+## Supplementary Info & Links
+
+[Arduino Code Info (For C++)](./arduinoCodeInfo.md)
+
+[Google Drive Folder](https://drive.google.com/drive/folders/1qjnQDnakjW4T2VA_t_dMa19qW6lmA9qH?usp=sharing)
+
+[Full Bill Of Materials](https://docs.google.com/spreadsheets/d/1ikpGfJ6LjHaBAVGgCHs3OJ50SzMK_VNal6e07bsFQgU/edit?usp=sharing)
+
+[Onshape Link for GEMS Box](https://cad.onshape.com/documents/b70ed68a7041da56e2077d16/w/0a278046a06a5ee9d45b70cf/e/ad4cc4771528db99137f5c68?renderMode=0&uiState=66cbc32414d50770149f88cf)
+
 ## Known Issues and Limitations
 
-- Arduino clock isn't totally accurate, so after a while there may be slightly more or less logs than expected
+- Arduino clock isn't perfectly accurate, so after a while there may be slightly more or less logs than expected
 - Can get repeated log if wait a precise amount of time, or miss a log if arduino restarted and got a precise amount of time (although unlikely)
 - Can't support multiple sensors of the same type on one glovebox (because it can't differentiate flags)
 - Should be ok, but untested with daylight savings time
-- After a while, the cache string will fill up arduino RAM
 - Must have Logging and Readout updates on the same cycle - can't do one more frequently than the other
 - Non-flexible file structure
+- gui.py doesn't work on 4100 lab computer (other computers untested)
+- Bug - wrong logs in log files (logging system not working)
 
-## Supplementary Info & Links
+## GEMS To-Do List
 
-[Arduino Code Info (For C++)](INSERT_GITHUB_LINK_HERE)
-
-[Google Drive Folder](https://)
-
-[Master Bill Of Materials](https://)
-
-Need to add:
-
-- code
-  - test c++ code
-  - arduino code
-  - getMac code
-  - python codes
-- pcb ordering files
-- pcb editing files
-- 3d printing files
-- 3d printing onshape link?
+- Get GUI working on lab computers
+- Set up python environment with conda
+- Figure out physical setup
+- Separate logging and readout cycles for more flexibility
+- Fix logging system
