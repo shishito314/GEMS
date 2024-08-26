@@ -30,6 +30,7 @@ constexpr char* END_FLAG = "End"; //                                            
 // ---------- May Be Changed ----------
 constexpr char NETWORK_SSID[] = [Insert Network Name Here];  // your network SSID (name)
 constexpr char NETWORK_PASS[] = [Insert Network Password Here];  // your network password (using WPA)
+
 // For Readouts On Disconnect
 constexpr uint16_t DISPLAY_REQUEST_WAIT = 8000;  // how long to wait for the HTTP request before changing to on-arduino calculation + readout
 constexpr uint16_t DISPLAY_REFRESH_RATE = 250;
