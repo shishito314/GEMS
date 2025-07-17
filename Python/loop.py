@@ -6,21 +6,23 @@
 
 import time
 import gems
-import threading
-
-threading.Thread()
 
 # -------------------- Warning Prints --------------------
-print("This python console is running GEMS, the Glovebox Environmental Monitoring System.")
-print("Please do not close this console unless you wish to stop the program")
+print("\033[91m" + "This python console is running GEMS, the Glovebox Environmental Monitoring System." + "\033[00m")
+print("\033[91m" + "Please do not close this console unless you wish to stop the program" + "\033[00m")
 
 # -------------------- Main Run Loop --------------------
 initTime = time.time()
 waitMarker = initTime
 
 while True:
-  if time.time() < waitMarker: continue
-  waitMarker += gems.CYCLE_TIMING
-
   for glovebox in gems.gloveboxes:
-    glovebox.update()
+    try:
+      glovebox.update()
+    except:
+      print("There was an error updating " + glovebox.name)
+
+  waitMarker += gems.CYCLE_TIMING
+  delay = waitMarker - time.time()
+  if delay > 0:
+    time.sleep(delay)

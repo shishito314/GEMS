@@ -1,5 +1,5 @@
 # -------------------- File Description --------------------
-# This file contains the code for the GEMS GUI (Graphical user interface).
+# This file contains the code for the GEMS GUI (Graphical User Interface).
 # When you wish to run the GUI, run this program. The program will stop
 # when the GUI window is closed.
 
@@ -14,6 +14,7 @@ import os
 
 import gems
 import data
+import utilities
 
 # -------------------- Constants --------------------
 WINDOW_WIDTH = 800
@@ -101,7 +102,7 @@ def showNow():
 	global nowPlotSensorType
 	if not nowPlotSensorType: nowPlotSensorType = sensorTabSystem.currentTab.sensorType
 	# Update Readouts
-	currentData = data.getAllLastMeasurements(gloveboxTabSystem.currentTab.glovebox)
+	currentData = data.getLastMeasurementAllSensors(gloveboxTabSystem.currentTab.glovebox)
 	readoutLabelsStr = ""
 	readoutTimeStampsStr = ""
 	readoutValuesStr = ""
@@ -113,18 +114,18 @@ def showNow():
 			readoutValuesStr += "\n"
 		readoutLabelsStr += sensor.flag
 		readoutTimeStampsStr += (gems.getDatetimeStr(currentData[sensor.flag][data.DATA_TIME_FLAG]) if not currentData[sensor.flag][data.DATA_TIME_FLAG] == None else "_____")
-		readoutValuesStr += (gems.getDatetimeStr(currentData[sensor.flag][sensor.flag]) if not currentData[sensor.flag][sensor.flag] == None else "_____")
+		readoutValuesStr += (gems.getDatetimeStr(currentData[sensor.flag][data.DATA_MEASUREMENTS_FLAG]) if not currentData[sensor.flag][data.DATA_MEASUREMENTS_FLAG] == None else "_____")
 	nowReadoutLabels.config(text=readoutLabelsStr)
 	nowReadoutValues.config(text=readoutValuesStr)
 	nowReadoutTimeStamps.config(text=readoutTimeStampsStr)
 
 	# Update Plot
 	plotData = data.getDataByTime(gloveboxTabSystem.currentTab.glovebox,
-																		datetime.datetime.now() - datetime.timedelta(minutes=timeScaleVal),
-																		datetime.datetime.now(), nowPlotSensorType)
+		datetime.datetime.now() - datetime.timedelta(minutes=timeScaleVal),
+		datetime.datetime.now(), nowPlotSensorType)
 	fig.clear()
 	nowPlot = fig.add_subplot()
-	data.subPlotData(nowPlot, plotData, nowPlotSensorType.flag)
+	data.subPlotData(nowPlot, plotData, title=nowPlotSensorType.flag)
 	canvas.draw()
 	# Pack (display) everything
 	gloveboxTabSystem.display()
@@ -188,9 +189,13 @@ def showLog():
 	gloveboxTabSystem.display()
 	# logFile = logFileDropdown.selection_get()
 	# logText.insert(tk.END, )
-	files = os.listdir("./" + gloveboxTabSystem.currentTab.glovebox.name)
+	walkResult = os.walk("./" + gloveboxTabSystem.currentTab.glovebox.name)
+	files = []
+	for dirPath, _, fileNames in walkResult:
+		for fileName in fileNames:
+			files.append(os.path.join(dirPath, fileName))
 	files.sort()
-	errorLogFileName = gems.ERROR_LOG_FILE + ".txt"
+	errorLogFileName = "./" + gloveboxTabSystem.currentTab.glovebox.name + "/" + gems.ERROR_LOG_FILE + ".txt"
 	hasErrorLog = errorLogFileName in files
 	# Rearranging the files so that errorLog is on the top, and then the files are in reverse chronological order
 	files.remove(errorLogFileName)
@@ -210,7 +215,7 @@ def showLogFile(e):
 	logFileName = e
 	logText.config(state="normal")
 	logText.delete('1.0', tk.END)
-	logFile = open("./" + gloveboxTabSystem.currentTab.glovebox.name + "/" + logFileName, "r")
+	logFile = open(logFileName, "r")
 	logFileStr = logFile.read()
 	logFile.close()
 	lines = logFileStr.splitlines()
@@ -218,7 +223,7 @@ def showLogFile(e):
 	charNum = len(str(len(lines))) + 1
 	displayLog = ""
 	for line in lines:
-		line = gems.makeStringLength(str(lineNum), charNum) + line + "\n"
+		line = utilities.makeStringLength(str(lineNum), charNum) + line + "\n"
 		lineNum += 1
 		displayLog += line
 	logText.insert(tk.END, displayLog)
