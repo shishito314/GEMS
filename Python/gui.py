@@ -1,7 +1,13 @@
-# -------------------- File Description --------------------
-# This file contains the code for the GEMS GUI (Graphical User Interface).
-# When you wish to run the GUI, run this program. The program will stop
-# when the GUI window is closed.
+"""
+Description:
+----------
+This file contains the code for the GEMS GUI (Graphical User Interface).
+
+Usage:
+----------
+When you wish to run the GUI, run this program. The program will stop
+when the GUI window is closed.
+"""
 
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -14,7 +20,6 @@ import os
 
 import gems
 import data
-import utilities
 
 # -------------------- Constants --------------------
 WINDOW_WIDTH = 800
@@ -223,7 +228,7 @@ def showLogFile(e):
 	charNum = len(str(len(lines))) + 1
 	displayLog = ""
 	for line in lines:
-		line = utilities.makeStringLength(str(lineNum), charNum) + line + "\n"
+		line = str(lineNum).ljust(charNum) + line + "\n"
 		lineNum += 1
 		displayLog += line
 	logText.insert(tk.END, displayLog)
@@ -289,6 +294,5 @@ GuiTab("Config", showConfig, [configText, configSave])
 title = ttk.Label(master=window, text="Glovebox Environmental Monitoring System")
 title.pack()
 guiTabSystem.display()
-# guiTabSystem.currentTab.display()
 gloveboxTabSystem.currentTab.display()
 window.mainloop()

@@ -1,0 +1,2 @@
+Glovebox: neptune
+Arduino: IP: 192.168.0.112 Display: True Sensors: Oxy Water

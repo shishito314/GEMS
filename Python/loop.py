@@ -1,8 +1,14 @@
-# -------------------- File Description --------------------
-# This file contains the main loop for the GEMS system. When you wish
-# to run the logging and wifi communications, run this program. Once started,
-# it will run indefinitely until the program is stopped. You may stop the program
-# by closing the python console it is running in.
+"""
+Description:
+----------
+This file contains the main loop for the GEMS system. 
+
+Usage:
+----------
+When you wish to run the logging and wifi communications, run this program.
+Once started, it will run indefinitely until the program is stopped.
+You may stop the program by closing the python console it is running in.
+"""
 
 import time
 import gems

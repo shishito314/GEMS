@@ -1,12 +1,13 @@
-# -------------------- File Description --------------------
-# This file contains code for a simple CLI (Command Line Interface)
-# to interact with the GEMS system. Functionality may be added
-# as needed or desired
-
+"""
+Description:
+----------
+This file contains code for a simple CLI (Command Line Interface)
+to interact with the GEMS system. Functionality may be added as needed or desired
+"""
 import gems
 import data
 
-# Functions
+# Commands
 def printHelp(_):
   print("Here are the possible commands:")
   print("    close - stop this CLI")
@@ -24,8 +25,16 @@ def printCurrent(_):
     currentData = data.getLastMeasurementAllSensors(glovebox)
     for sensor in glovebox.allSensors:
       print(sensor.flag, end="\t")
-      print(gems.getDatetimeStr(currentData[sensor.flag][data.DATA_TIME_FLAG]) if not currentData[sensor.flag][data.DATA_TIME_FLAG] == None else "_____", end="\t")
-      print(gems.getDatetimeStr(currentData[sensor.flag][sensor.flag]) if not currentData[sensor.flag][sensor.flag] == None else "_____")
+      print(
+        gems.getDatetimeStr(currentData[sensor.flag][data.DATA_TIME_FLAG])
+        if not currentData[sensor.flag][data.DATA_TIME_FLAG] == None
+        else "_____", end="\t"
+      )
+      print(
+        gems.getDatetimeStr(currentData[sensor.flag][data.DATA_MEASUREMENTS_FLAG])
+        if not currentData[sensor.flag][data.DATA_MEASUREMENTS_FLAG] == None
+        else "_____"
+      )
 
 def clearErr(args):
   if len(args) != 1:

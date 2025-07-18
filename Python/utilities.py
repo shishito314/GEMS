@@ -1,117 +1,76 @@
-# -------------------- File Description --------------------
-# This file contains contains various utility methods used across the other files.
+"""
+Description:
+----------
+Various utility methods for use in other files.
+"""
 
-import datetime # for getting the time
+import datetime
+from typing import List, Optional
 
-# -------------------- Utility Functions --------------------
-# ---------- Text Parsing Utilities ----------
-# Gets the text between a given start and end flag
-def readFromUntil(text, flagStart, flagEnd):
-  prev = text[0:len(flagStart)]
-  startIndex = len(flagStart)
-  while (prev != flagStart) and (startIndex < len(text)):
-    startIndex += 1
-    prev = text[(startIndex - len(flagStart)):(startIndex)]
-  prev = text[startIndex:(startIndex+len(flagEnd))]
-  endIndex = startIndex
-  while (prev != flagEnd) and (endIndex < len(text)):
-    endIndex += 1
-    prev = text[(endIndex):(endIndex + len(flagEnd))]
-  return text[startIndex:endIndex]
-# readFromUntil, but returns None if flagEnd isn't found
-def readFromUntilRequireEnd(text, flagStart, flagEnd):
-  prev = text[0:len(flagStart)]
-  startIndex = len(flagStart)
-  while (prev != flagStart) and (startIndex < len(text)):
-    startIndex += 1
-    prev = text[(startIndex - len(flagStart)):(startIndex)]
-  prev = text[startIndex:(startIndex+len(flagEnd))]
-  endIndex = startIndex
-  while (prev != flagEnd) and (endIndex < len(text)):
-    endIndex += 1
-    prev = text[(endIndex):(endIndex + len(flagEnd))]
-  if prev != flagEnd:
-    return None
-  return text[startIndex:endIndex]
-# Gets the text up until a given flag
-def readUntil(text, flag):
-  prev = text[0:len(flag)]
-  index = len(flag)
-  while (prev != flag) and (index < len(text)):
-    index += 1
-    prev = text[(index - len(flag)):(index)]
-  return text[0:index - len(flag)]
-# Gets the text from a given start flag until any of the given end flags
-def readFromUntilFlags(text, flagStart, flagsEnd):
-  prev = text[0:len(flagStart)]
-  startIndex = len(flagStart)
-  while (prev != flagStart) and (startIndex < len(text)):
-    startIndex += 1
-    prev = text[(startIndex - len(flagStart)):(startIndex)]
-  # prev = text[startIndex:(startIndex+len(flagEnd))]
-  endIndex = startIndex
-  done = False
-  while not done:
-    endIndex += 1
+# -------------------- Text Parsing Utilities --------------------
+def readFromUntil(text: str, flagStart: str, flagEnd: str) -> str:
+    """Extracts text between flagStart and flagEnd (exclusive)."""
+    startIdx = text.find(flagStart)
+    if startIdx == -1:
+        return ''
+    startIdx += len(flagStart)
+    endIdx = text.find(flagEnd, startIdx)
+    return text[startIdx:endIdx] if endIdx != -1 else text[startIdx:]
+
+
+def readFromUntilRequireEnd(text: str, flagStart: str, flagEnd: str) -> Optional[str]:
+    """Like readFromUntil, but returns None if flagEnd isn't found."""
+    startIdx = text.find(flagStart)
+    if startIdx == -1:
+        return None
+    startIdx += len(flagStart)
+    endIdx = text.find(flagEnd, startIdx)
+    return text[startIdx:endIdx] if endIdx != -1 else None
+
+
+def readUntil(text: str, flag: str) -> str:
+    """Returns text up to the first occurrence of flag."""
+    idx = text.find(flag)
+    return text[:idx] if idx != -1 else text
+
+
+def readFromUntilFlags(text: str, flagStart: str, flagsEnd: List[str]) -> str:
+    """Gets the text starting after flagStart and ending at the first of any flagsEnd."""
+    startIdx = text.find(flagStart)
+    if startIdx == -1:
+        return ''
+    startIdx += len(flagStart)
+
+    endIdx = len(text)
     for flag in flagsEnd:
-      if text[endIndex:endIndex+len(flag)] == flag:
-        done = True
-    if endIndex >= len(text):
-      done = True
-  # while (prev != flagEnd) and (endIndex < len(text)):
-  #   endIndex += 1
-  #   prev = text[(endIndex):(endIndex + len(flagEnd))]
-  return text[startIndex:endIndex]
-# Gets all the text after a given flag
-def readFrom(text, flag):
-  prev = text[0:len(flag)]
-  index = len(flag)
-  while (prev != flag) and (index < len(text)):
-    index += 1
-    prev = text[(index - len(flag)):(index)]
-  return text[index:len(text)]
-# Gets the index where the flag starts (i.e. the first character of the flag)
-def getFlagStartIndex(text, flag):
-  prev = text[0:len(flag)]
-  index = 0
-  while (prev != flag) and (index < (len(text) - len(flag))):
-    index += 1
-    prev = text[index:(index + len(flag))]
-  return index
-# Gets the index where the flag ends (i.e. one character after the flag)
-def getFlagEndIndex(text, flag):
-  prev = text[0:len(flag)]
-  index = len(flag)
-  while (prev != flag) and (index < len(text)):
-    index += 1
-    prev = text[(index - len(flag)):(index)]
-  return index
-# removes all the spaces in a string
-def removeSpaces(text):
-  return text.replace(" ", "")
-# adds whitespace if the text is shorter than the specified length. If not, doesn't do anything.
-def makeStringLength(text, length):
-  if len(text) < length:
-    for i in range(length - len(text)):
-      text += " "
-  return text
+        idx = text.find(flag, startIdx)
+        if 0 <= idx < endIdx:
+            endIdx = idx
 
-# ---------- Datetime Utilities ----------
-# returns a datetime object for the passed string, using the "yr-month-day hr:min:sec.decimal" format
-def convertStrToDatetime(string):
-  return datetime.datetime.strptime(string, "%Y-%m-%d %H:%M:%S.%f")
-# returns a datetime object for the passed string, using the "yr-month-day" format
-def convertStrToDate(string):
-  return datetime.datetime.strptime(string, "%Y-%m-%d").date()
-# returns a timeDelta that is the difference between two times given as strings
-def timeDiffFromString(start, stop):
-    tStart = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
-    tStop = datetime.datetime.strptime(stop, "%Y-%m-%d %H:%M:%S")
-    return tStop - tStart
+    return text[startIdx:endIdx]
 
-# ---------- Miscellaneous Utilities ----------
-def sortDictionariesByValue(listOfDictionaries, key):
-  listOfDictionaries.sort(key=lambda d: d[key])
-# maps a value in a certain range to another range
-def map(l1, h1, l2, h2, val):
-  return (val-l1) / (h1-l1) * (h2-l2) + l2
+
+def readFrom(text: str, flag: str) -> str:
+    """Returns text after the first occurrence of flag."""
+    idx = text.find(flag)
+    return text[idx + len(flag):] if idx != -1 else ''
+
+def removeSpaces(text: str) -> str:
+    """Removes all spaces from the string."""
+    return text.replace(' ', '')
+
+# -------------------- Datetime Utilities --------------------
+def strToDatetime(string: str) -> datetime.datetime:
+    """Converts string of format 'YYYY-MM-DD HH:MM:SS.ssssss' to datetime."""
+    return datetime.datetime.strptime(string, "%Y-%m-%d %H:%M:%S.%f")
+
+
+def strToDate(string: str) -> datetime.date:
+    """Converts string of format 'YYYY-MM-DD' to date."""
+    return datetime.datetime.strptime(string, "%Y-%m-%d").date()
+
+# -------------------- Miscellaneous Utilities --------------------
+
+def mapValue(l1: float, h1: float, l2: float, h2: float, val: float) -> float:
+    """Maps a value from one range to another."""
+    return (val - l1) / (h1 - l1) * (h2 - l2) + l2
