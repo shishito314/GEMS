@@ -2,6 +2,29 @@
 
 ## Table of Contents
 
+- [Overview](#overview)
+- [Instructions For Use](#instructions-for-use)
+  - [Setup](#setup)
+  - [Binding Arduino MAC Addresses](#binding-arduino-mac-addresses)
+  - [Changing Display I2C Addresses](#changing-display-i2c-addresses)
+  - [Python Configuration](#python-configuration)
+  - [Adding Sensors](#adding-sensors)
+  - [Changing Program Constants and Parameters](#changing-program-constants-and-parameters)
+- [How GEMS works](#how-gems-works)
+  - [Hardware](#hardware)
+    - [Bill Of Materials](#bill-of-materials)
+    - [Wifi Communications](#wifi-communications)
+    - [Sensor Measurement](#sensor-measurement)
+  - [Software](#software)
+    - [Python Overview](#python-overview)
+    - [Arduino Code Overview](#arduino-code-overview)
+    - [Technical Details](#technical-details)
+      - [Wifi & Caching](#wifi--caching)
+      - [Smoothing](#smoothing)
+      - [Behavior on Disconnect](#behavior-on-disconnect)
+- [Known Issues and Limitations](#known-issues-and-limitations)
+- [Links](#links)
+
 ### Overview
 
 Here's the basic idea of the GEMS system in it's current implementation:
@@ -218,7 +241,7 @@ When the display arduino gets disconnected, it will calculate the oxygen and hum
 - Can't support multiple sensors of the same type on one glovebox (because it can't differentiate flags)
 - Logging untested with daylight savings time
 - Non-flexible file structure
--
+- Some computers may stop sending wifi requests when the computer screen turns off
 
 ## Links
 
