@@ -10,6 +10,7 @@ Once started, it will run indefinitely until the program is stopped.
 You may stop the program by closing the python console it is running in.
 """
 
+import datetime
 import time
 import gems
 
@@ -25,8 +26,9 @@ while True:
   for glovebox in gems.gloveboxes:
     try:
       glovebox.update()
-    except:
+    except Exception as e:
       print("There was an error updating " + glovebox.name)
+      print(f"{datetime.datetime.now()}\t{e}")
 
   waitMarker += gems.CYCLE_TIMING
   delay = waitMarker - time.time()

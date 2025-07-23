@@ -177,7 +177,7 @@ class Oxy(Sensor):
     if current > OXY_CURRENT_MAX:
       self.glovebox.writeError(getCurrentDatetimeStr(), "The current calculated for the oxygen sensor is higher than the threshold")
       return OFFSCALE_HIGH_MSSG
-    ppm = map(OXY_CURRENT_MIN, OXY_CURRENT_MAX, OXY_PPM_MIN, OXY_PPM_MAX, current)
+    ppm = mapValue(OXY_CURRENT_MIN, OXY_CURRENT_MAX, OXY_PPM_MIN, OXY_PPM_MAX, current)
     return ppm
 
 class Water(Sensor):
@@ -226,7 +226,7 @@ class Water(Sensor):
     if current > WATER_CURRENT_MAX:
       self.glovebox.writeError(getCurrentDatetimeStr(), "The current calculated for the dewpoint sensor is higher than the threshold")
       return OFFSCALE_HIGH_MSSG
-    dewPoint = map(WATER_CURRENT_MIN, WATER_CURRENT_MAX, WATER_DEWPOINT_MIN, WATER_DEWPOINT_MAX, current)
+    dewPoint = mapValue(WATER_CURRENT_MIN, WATER_CURRENT_MAX, WATER_DEWPOINT_MIN, WATER_DEWPOINT_MAX, current)
     exponent = (13.6627 - 2720.84 / (275.38 + dewPoint))
     ppm = pow(10, exponent)
     return ppm
@@ -310,7 +310,6 @@ class Arduino:
       log = pageLogs[i]
       dictionary = {}
       arduinoTimeStr = readFromUntilRequireEnd(log, CACHE_TIME_FLAG, END_FLAG)
-      print(str(self.convertMillisToDatetimeBefore(int(arduinoTimeStr))))
 
       if not arduinoTimeStr:
         continue
@@ -452,7 +451,7 @@ SENSOR_CONFIG_FLAG_TO_CLASS = {
   "Water" : Water
 }
 
-gloveboxes = [] # List of all gloveboxes
+gloveboxes: List[Glovebox] = [] # List of all gloveboxes
 gloveboxNames = [] # Names of all the gloveboxes, in identical order as the gloveboxes list (used for getGloveboxByName utility)
 with open(CONFIG_FILE, "r") as configFile:  
   configFileStr = configFile.read()
