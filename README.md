@@ -25,7 +25,7 @@
 - [Known Issues and Limitations](#known-issues-and-limitations)
 - [Links](#links)
 
-### Overview
+## Overview
 
 Here's the basic idea of the GEMS system in it's current implementation:
 
