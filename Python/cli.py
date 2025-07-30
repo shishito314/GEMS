@@ -40,8 +40,8 @@ def clearErr(args):
   if len(args) != 1:
     print("Enter exactly one argument after \"clear_err\", the glovebox whose error log you would like to clear")
     return
-  with open(gems.getGloveboxByName(args[0]).getErrorLogPath(), "w") as errorFile:
-    errorFile.truncate(0)
+  # with open(gems.getGloveboxByName(args[0]).getErrorLogPath(), "w") as errorFile:
+  #   errorFile.truncate(0)
 
 inputFunctionTuples = [
   ("help", printHelp),

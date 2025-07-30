@@ -68,11 +68,11 @@ def getLastNMeasurements(glovebox: Glovebox, numEntries, sensorType, keepErrors=
     try:
       # using datatype to construct/cast the string from the logfile to the desired type
       # If the flag is the last in the line, will just return everything after it
-      data[DATA_MEASUREMENTS_FLAG].append(sensorType.datatype(removeSpaces(readFrom(line, sensorType.flag))))
+      data[DATA_MEASUREMENTS_FLAG].append(sensorType.datatype(removeSpaces(readFrom(line, " "))))
       data[DATA_TIME_FLAG].append(time)
     except:
       if (keepErrors):
-        data[DATA_MEASUREMENTS_FLAG].append(removeSpaces(readFrom(line, sensorType.flag)))
+        data[DATA_MEASUREMENTS_FLAG].append(removeSpaces(readFrom(line, " ")))
         data[DATA_TIME_FLAG].append(time)
       else:
         continue
@@ -121,12 +121,12 @@ def getLastMeasurement(glovebox: Glovebox, sensorType, keepErrors=False):
     try:
       # using datatype to construct/cast the string from the logfile to the desired type
       # If the flag is the last in the line, will just return everything after it
-      data[DATA_MEASUREMENTS_FLAG] = sensorType.datatype(removeSpaces(readFrom(line, sensorType.flag)))
+      data[DATA_MEASUREMENTS_FLAG] = sensorType.datatype(removeSpaces(readFrom(line, " ")))
       data[DATA_TIME_FLAG] = time
       break
     except:
       if (keepErrors):
-        data[DATA_MEASUREMENTS_FLAG] = removeSpaces(readFrom(line, sensorType.flag))
+        data[DATA_MEASUREMENTS_FLAG] = removeSpaces(readFrom(line, " "))
         data[DATA_TIME_FLAG] = time
         break
       else:
@@ -183,8 +183,7 @@ def getDataByTime(glovebox: Glovebox, startTime: datetime.datetime, endTime: dat
 
   # get log data as text
   with open(logFilePath, "r") as log:
-    logStr = log.read()
-  logLines = logStr.splitlines()
+    logLines = log.readlines()
   lineIndex = 0
   line = logLines[0]
 
@@ -193,6 +192,7 @@ def getDataByTime(glovebox: Glovebox, startTime: datetime.datetime, endTime: dat
     isBeforeStart = logIsBefore(line, startTime) # so we can try/except in the loop
   except:
     isBeforeStart = True
+
   while isBeforeStart:
     lineIndex += 1
     if (lineIndex >= len(logLines)):
@@ -212,23 +212,24 @@ def getDataByTime(glovebox: Glovebox, startTime: datetime.datetime, endTime: dat
     logFilePath = os.path.join(sensorFolderName, logFileName)
 
     with open(logFilePath, "r") as log:
-      logStr = log.read()
-    logLines = logStr.splitlines()
+      logLines = log.readLines()
     lineIndex = 0
   line = logLines[lineIndex]
 
   isBeforeEnd = logIsBefore(line, endTime)
+
   while isBeforeEnd:
     try: # Adding line to data
       # using datatype to construct/cast the string from the logfile to the desired type
+      # print(line)
       data[DATA_MEASUREMENTS_FLAG].append(sensorType.datatype(removeSpaces(readFrom(line, sensorType.flag))))
       data[DATA_TIME_FLAG].append(strToDatetime(line[0:DATETIME_STR_LENGTH]))
     except:
       if (keepErrors):
         data[DATA_MEASUREMENTS_FLAG].append(removeSpaces(readFrom(line, sensorType.flag)))
         data[DATA_TIME_FLAG].append(strToDatetime(line[0:DATETIME_STR_LENGTH]))
-      else:
-        continue
+      # else:
+      #   continue
 
     lineIndex += 1
     
@@ -241,13 +242,15 @@ def getDataByTime(glovebox: Glovebox, startTime: datetime.datetime, endTime: dat
       logFilePath = os.path.join(sensorFolderName, logFileName)
 
       with open(logFilePath, "r") as log:
-        logStr = log.read()
-      logLines = logStr.splitlines()
+        logLines = log.readlines()
       lineIndex = 0
     line = logLines[lineIndex]
 
-    isBeforeEnd = logIsBefore(line, endTime)
-    
+    try:
+      isBeforeEnd = logIsBefore(line, endTime)
+    except:
+      isBeforeEnd = True
+  
   return data
 
 def getDataByTimeAllSensors(glovebox: Glovebox, startTime: datetime.datetime, endTime: datetime.datetime, keepErrors=False):

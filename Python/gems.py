@@ -2,21 +2,22 @@
 Description:
 ----------
 Architecture, setup, and processes for GEMS system.
-Configuration handled upon import according to config.txt.
+Configuration handled upon import according to the specified CONFIG_FILE.
 """
 
 import urllib.request # for sending http requests to arduinos
 import datetime # for getting the time
 import os # for checking file existence
+from typing import Dict, List, Any
 from utilities import *
 
 # -------------------- Constants (Must Match Arduino) --------------------
 
 # Note: for text parsing, flags must contain no spaces
 # Sensor flags for text parsing, sending data, and logs.
-TEMP_FLAG = "Temp:"                                                                         # MUST MATCH ARDUINO
-OXY_FLAG = "Oxy:"                                                                           # MUST MATCH ARDUINO
-WATER_FLAG = "Water:"                                                                       # MUST MATCH ARDUINO
+TEMP_FLAG = "T<"                                                                            # MUST MATCH ARDUINO
+OXY_FLAG = "O<"                                                                             # MUST MATCH ARDUINO
+WATER_FLAG = "W<"                                                                           # MUST MATCH ARDUINO
 LOG_FLAGS = [TEMP_FLAG, OXY_FLAG, WATER_FLAG] # For log file parsing (Used in data.py)        NO MATCH
 # ^ LOG_FLAGS doesn't need a corresponding arduino constant, but should contain all the flags for the sensors (like the ones above)
 
@@ -25,20 +26,20 @@ DATA_TRANSFER_SUCCESS_FLAG = "Success" # Sent to confirm successfully recieved c
 CACHE_LOG_FLAG = "Log:" # For parsing logs from the Arduino HTTP response                     MUST MATCH ARDUINO
 CACHE_REQUEST_FLAG = "Log_" # Used to let the Arduino know we want it's cache data            MUST MATCH ARDUINO
 REQUEST_RECEIVED_FLAG = "Received" # Sent by the arduino to confirm it got the cache request  MUST MATCH ARDUINO
-CACHE_TIME_FLAG = "Time:" # For dictionaries and sent by the arduino to give the millis time  MUST MATCH ARDUINO
+CACHE_TIME_FLAG = "Time<" # For dictionaries and sent by the arduino to give the millis time  MUST MATCH ARDUINO
 
 # Miscellaneous Wifi Communication Flags
 DISPLAY_FLAG = "Display_" # For sending display data to the arduino.                          MUST MATCH ARDUINO
 DISPLAY_ERROR_MESSAGE = "Error" # What should be sent to the arduino in the case of an error  MUST MATCH ARDUINO
 
-END_FLAG = "End" # For text parsing                                                           MUST MATCH ARDUINO
+END_FLAG = ">" # For text parsing                                                             MUST MATCH ARDUINO
 
 # -------------------- Other Constants --------------------
 # ---------- MAY BE CHANGED ----------
-DATETIME_STR_LENGTH = 21 # How to trim the datetime string for the desired precision.
+DATETIME_STR_LENGTH = 19 # How to trim the datetime string for the desired precision.
 # 19 is second precision, 21 is tenth second, 22 hundredth, and so on.
 
-CYCLE_TIMING = 15 # Timing between sending http requests and updating display values
+CYCLE_TIMING = 60 # Timing between sending http requests and updating display values
 # (may be different than logging cycle, which depends on the caching cycle time in the arduino code)
 HTTP_WAIT_TIME = CYCLE_TIMING / 3 # Timeout for an HTTP Request
 # max wait should be this x3 - in box arduino, out of box arduino, out of box arduino (for displays)
@@ -70,7 +71,8 @@ HTTP_REQUEST_FAIL = "Request Failed"
 # ---------- SHOULD NOT CHANGE ----------
 CONFIG_FILE = "config.txt" # Name for the config file
 INTERNAL_DIR = ".internal" # Keeps track of timestamps so they persist between executions of the python script
-ERROR_LOG_FILE = "errorLog" # Name for the error log file
+ERROR_LOG_PREFIX = "errorLog_" # Name for the error log file
+ERROR_LOG_FOLDER = "errors"
 LOG_FILE_PREFIX = "log_"
 SENSOR_FOLDER_NAMES = {
   OXY_FLAG: "oxy",
@@ -98,6 +100,7 @@ class Sensor:
   def getDisplay(self):
     """Returns the string to be sent to the arduino for displaying"""
     raise NotImplementedError('getDisplay method not defined')
+  
   def addVal(self, val):
     """Takes in new measurements and processes them. May include transformation or averaging logic."""
     raise NotImplementedError('addVal method not defined')
@@ -114,10 +117,7 @@ class Temp(Sensor):
     try:
       return str(round(self.lastValue, 3))
     except:
-      try:
-        return self.lastValue
-      except:
-        return "Error"
+      return self.lastValue
   
   def getDisplay(self):
     try:
@@ -147,10 +147,7 @@ class Oxy(Sensor):
     try:
       return str(round(self.lastValue, 3))
     except:
-      try:
-        return self.lastValue
-      except:
-        return "Error"
+      return self.lastValue
   
   def getDisplay(self):
     if self.lastValue == OFFSCALE_HIGH_MSSG:
@@ -172,10 +169,10 @@ class Oxy(Sensor):
     """Calculates ppm O2 from 10-bit arduino voltage measurement, returns string if offscale"""
     current = val / SENSE_RESISTANCE * VOLT_REF / 1023 * 1000
     if current < OXY_CURRENT_MIN:
-      self.glovebox.writeError(getCurrentDatetimeStr(), "The current calculated for the oxygen sensor is lower than the threshold")
+      self.glovebox.writeError(datetime.datetime.now(), "Oxy current offscale low")
       return OFFSCALE_LOW_MSSG
     if current > OXY_CURRENT_MAX:
-      self.glovebox.writeError(getCurrentDatetimeStr(), "The current calculated for the oxygen sensor is higher than the threshold")
+      self.glovebox.writeError(datetime.datetime.now(), "Oxy current offscale high")
       return OFFSCALE_HIGH_MSSG
     ppm = mapValue(OXY_CURRENT_MIN, OXY_CURRENT_MAX, OXY_PPM_MIN, OXY_PPM_MAX, current)
     return ppm
@@ -196,10 +193,7 @@ class Water(Sensor):
     try:
       return str(round(self.lastValue, 3))
     except:
-      try:
-        return self.lastValue
-      except:
-        return "Error"
+      return self.lastValue
   
   def getDisplay(self):
     if self.lastValue == OFFSCALE_HIGH_MSSG:
@@ -221,10 +215,10 @@ class Water(Sensor):
     """Calculates ppm H2O from 10-bit arduino voltage measurement, returns string if offscale"""
     current = val / SENSE_RESISTANCE * VOLT_REF / 1023 * 1000
     if current < WATER_CURRENT_MIN:
-      self.glovebox.writeError(getCurrentDatetimeStr(), "The current calculated for the dewpoint sensor is lower than the threshold")
+      self.glovebox.writeError(datetime.datetime.now(), "Water current offscale low")
       return OFFSCALE_LOW_MSSG
     if current > WATER_CURRENT_MAX:
-      self.glovebox.writeError(getCurrentDatetimeStr(), "The current calculated for the dewpoint sensor is higher than the threshold")
+      self.glovebox.writeError(datetime.datetime.now(), "Water current offscale high")
       return OFFSCALE_HIGH_MSSG
     dewPoint = mapValue(WATER_CURRENT_MIN, WATER_CURRENT_MAX, WATER_DEWPOINT_MIN, WATER_DEWPOINT_MAX, current)
     exponent = (13.6627 - 2720.84 / (275.38 + dewPoint))
@@ -254,7 +248,7 @@ class Arduino:
     try:
       return str(urllib.request.urlopen(self.url + message, timeout=HTTP_WAIT_TIME).read())
     except:
-      self.glovebox.writeError(getCurrentDatetimeStr(), "Did not recieve HTTP response from " + self.url + message)
+      self.glovebox.writeError(datetime.datetime.now(), "No HTTP response: " + self.url + message)
       return HTTP_REQUEST_FAIL
   
   def convertMillisToDatetimeBefore(self, millis):
@@ -272,9 +266,6 @@ class Arduino:
     self.newData = []
     timeBefore = datetime.datetime.now()
     page = self.request(CACHE_REQUEST_FLAG + (DATA_TRANSFER_SUCCESS_FLAG if self.lastRequestSuccess else ""))
-    print()
-    print(page)
-    print()
     timeAfter = datetime.datetime.now()
     timeAt = timeBefore + ((timeAfter-timeBefore) / 2) # Approximation for the time the arduino sent response back
     if (page == HTTP_REQUEST_FAIL) or (not REQUEST_RECEIVED_FLAG in page):
@@ -292,8 +283,7 @@ class Arduino:
     self.datetimeReference = timeAt
     self.millisReference = int(readFromUntil(timeHeader, CACHE_TIME_FLAG, END_FLAG))
 
-    if not os.path.isdir("./" + INTERNAL_DIR):
-      os.mkdir("./" + INTERNAL_DIR)
+    makeDirIfNotExist("./" + INTERNAL_DIR)
     internalFileName = self.getInternalFilePath()
     if os.path.isfile(internalFileName):
       with open(internalFileName, "r") as internalFile:
@@ -337,7 +327,7 @@ class Arduino:
 
 # Glovebox
 class Glovebox:
-  def __init__(self, name, arduinos: List[Arduino]):
+  def __init__(self, name: str, arduinos: List[Arduino]):
     self.name = name
     self.arduinos = arduinos
     self.allSensors: List[Sensor] = []
@@ -351,11 +341,11 @@ class Glovebox:
     """Writes a new line in the log file for the passed data."""
     logFile.write(self.makeLogLine(data, sensor))
 
-  def makeLogLine(self, data, sensor):
+  def makeLogLine(self, data: Dict[str, Any], sensor):
     """Returns the string for a new line of the log file given the passed data"""
     line = getDatetimeStr(data[CACHE_TIME_FLAG])
     if (sensor.flag in data):
-      line += (" " + sensor.flag + " " + data[sensor.flag])
+      line += (" " + data[sensor.flag])
     line.rstrip()
     line += "\n"
     return line
@@ -364,8 +354,8 @@ class Glovebox:
     """Returns today's logfile for this glovebox"""
     return "./" + self.name + "/" + SENSOR_FOLDER_NAMES[sensor.flag] + "/" + LOG_FILE_PREFIX + str(dateTime)[0:10] + ".txt"  
 
-  def getErrorLogPath(self):
-    return "./" + self.name + "/" + ERROR_LOG_FILE + ".txt"
+  def getErrorLogPathWithDateTime(self, dateTime):
+    return "./" + self.name + "/" + ERROR_LOG_FOLDER + "/" + ERROR_LOG_PREFIX + str(dateTime)[0:10]  + ".txt"
 
   def update(self):
     """Gets new sensor values, logs them, and sends display values"""
@@ -380,12 +370,10 @@ class Glovebox:
       return
 
     # Log data
-    if not os.path.isdir("./" + self.name):
-      os.mkdir("./" + self.name)
+    makeDirIfNotExist("./" + self.name)
 
     for sensor in self.allSensors:
-      if not os.path.isdir("./" + self.name + "/" + SENSOR_FOLDER_NAMES[sensor.flag]):
-        os.mkdir("./" + self.name + "/" + SENSOR_FOLDER_NAMES[sensor.flag])
+      makeDirIfNotExist("./" + self.name + "/" + SENSOR_FOLDER_NAMES[sensor.flag])
 
       for log in allNewData:
         if log[sensor.flag]:
@@ -404,17 +392,17 @@ class Glovebox:
       if arduino.isDisplay:
         arduino.request(displayStr)
 
-  def writeError(self, timeStr, message):
+  def writeError(self, sensorsAffected, dateTime, message):
     """Writes an error to the error log file"""
-    if not os.path.isdir("./" + self.name):
-      os.mkdir("./" + self.name)
-    with open(self.getErrorLogPath(), "a") as file:
-      file.write(f"{timeStr} {message}\n")
+    makeDirIfNotExist("./" + self.name)
+    with open(self.getErrorLogPathWithDateTime(dateTime), "a") as file:
+      errorStr = f"{getDatetimeStr(dateTime)} [ "
+      for sensor in sensorsAffected:
+        errorStr += sensor.__class__.__name__ + " "
+      errorStr += f"] {message}\n"
+      file.write(errorStr)
 
 # -------------------- Utility Functions --------------------
-def getCurrentDatetimeStr():
-  """Returns a string representing the current date and time."""
-  return str(datetime.datetime.now())[0:DATETIME_STR_LENGTH]
 def getDatetimeStr(time):
   """Returns a string representing the given datetime."""
   return str(time)[0:DATETIME_STR_LENGTH]
@@ -453,6 +441,9 @@ SENSOR_CONFIG_FLAG_TO_CLASS = {
 
 gloveboxes: List[Glovebox] = [] # List of all gloveboxes
 gloveboxNames = [] # Names of all the gloveboxes, in identical order as the gloveboxes list (used for getGloveboxByName utility)
+
+assert os.path.exists(CONFIG_FILE), f"Config file \"{CONFIG_FILE}\" not found."
+
 with open(CONFIG_FILE, "r") as configFile:  
   configFileStr = configFile.read()
 # File Parsing
@@ -488,3 +479,6 @@ for configBox in configBoxes:
     arduinoIndex += 1
   gloveboxes.append(Glovebox(name, arduinos))
   gloveboxNames.append(name)
+
+# Fail if no gloveboxes
+assert gloveboxes, f"No gloveboxes parsed from config file \"{CONFIG_FILE}.\""

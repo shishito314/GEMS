@@ -6,6 +6,7 @@ Various utility methods for use in other files.
 
 import datetime
 from typing import List, Optional
+import os
 
 # -------------------- Text Parsing Utilities --------------------
 def readFromUntil(text: str, flagStart: str, flagEnd: str) -> str:
@@ -61,8 +62,12 @@ def removeSpaces(text: str) -> str:
 
 # -------------------- Datetime Utilities --------------------
 def strToDatetime(string: str) -> datetime.datetime:
-    """Converts string of format 'YYYY-MM-DD HH:MM:SS.ssssss' to datetime."""
-    return datetime.datetime.strptime(string, "%Y-%m-%d %H:%M:%S.%f")
+    """Converts string of format 'YYYY-MM-DD HH:MM:SS.ssssss' or 'YYYY-MM-DD HH:MM:SS' to datetime."""
+    try:
+        return datetime.datetime.strptime(string, "%Y-%m-%d %H:%M:%S.%f")
+    except:
+        return datetime.datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
+
 
 
 def strToDate(string: str) -> datetime.date:
@@ -74,3 +79,14 @@ def strToDate(string: str) -> datetime.date:
 def mapValue(l1: float, h1: float, l2: float, h2: float, val: float) -> float:
     """Maps a value from one range to another."""
     return (val - l1) / (h1 - l1) * (h2 - l2) + l2
+
+# takes any number of lists and returns a list formed by concatenating the given lists
+def listJoin(*args):
+	endList = args[0]
+	for i in range(1, len(args)):
+		endList.extend(args[i])
+	return endList
+
+def makeDirIfNotExist(path):
+    if not os.path.isdir(path):
+      os.mkdir(path)
