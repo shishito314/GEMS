@@ -21,6 +21,7 @@ class Log(GuiTab):
     def unDisplay(self):
         for widget in self.widgets:
             widget.pack_forget()
+    
     def showLogFile(self, e):
         self.logText.pack_forget()
         self.logFileName = e
@@ -40,6 +41,7 @@ class Log(GuiTab):
         self.logText.insert(tk.END, displayLog)
         self.logText.config(state="disabled")
         self.logText.pack(side=tk.TOP, expand=True, fill=tk.BOTH, padx=20, pady=20)
+    
     def displayFunc(self):
         self.gloveboxTabSystem.display()
         walkResult = os.walk("./" + self.gloveboxTabSystem.currentTab.glovebox.name)

@@ -202,9 +202,7 @@ There are some other pieces of hardware that address a few problems:
 #### Arduino Code Overview
 
 - [oxyWaterDisplay](./Arduino/oxyWaterDisplay/): Handles sensor measurements for the oxygen and dewpoint sensors, wifi communication, and readouts.
-
 - [temp](./Arduino/temp/): Similar to the oxyWaterDisplay sketch, but stripped down for only the temperature sensor and wifi, no displays.
-
 - [getMacAddress.ino](./Arduino/getMacAddress.ino): Connects to the router wifi network, then prints the Arduino MAC address in the Serial Monitor.
 
 #### Technical Details
@@ -213,7 +211,7 @@ There are some other pieces of hardware that address a few problems:
 
 The following wifi protocol and caching system are designed to prevent data from being lost, even if HTTP requests or responses are missed:
 
-The arduino has a cache that stores the logs to send to the lab computer. Conceptually, the arduino cache has two parts. The "old" part of the cache consists of data that has already been sent, but the arduino isn't sure that the computer received it. The "new" part of the cache is data that has not yet been sent.
+The arduino has a cache that stores the logs to send to the lab computer. Conceptually, the arduino cache has two parts. The "old" part of the cache consists of data that has already been sent, but the arduino isn't sure that the computer received it. The "new" part of the cache is data that has not yet been sent. (In practice, for memory management, I use an array with flexible start/end indices and wraparound behavior).
 
 Every [CACHE_CYCLE_DELAY] milliseconds, the arduino will add a new log to the new part of the cache. When the arduino receives a request from the lab computer, the request comes with a note that says whether or not the computer got the previous request. If so, the arduino will clear the old cache to avoid sending repeat data. Then, the arduino will send the cache via wifi to the computer, and the entire cache will be labeled as "old" (since the data was sent). If the computer did not receive the previous request, the old cache will not be cleared and therefore the data will be resent.
 
@@ -249,3 +247,5 @@ When the display arduino gets disconnected, it will calculate the oxygen and hum
 [Google Drive Folder](https://drive.google.com/drive/folders/1qjnQDnakjW4T2VA_t_dMa19qW6lmA9qH?usp=sharing)
 
 [Full Bill Of Materials](https://docs.google.com/spreadsheets/d/1ikpGfJ6LjHaBAVGgCHs3OJ50SzMK_VNal6e07bsFQgU/edit?usp=sharing)
+
+[Desmos Graph For Spec Calculations](https://www.desmos.com/calculator/oaaztaypr6)
