@@ -2,22 +2,22 @@
 // -------------------- Constants (Must Match Python) --------------------
 // For HTTP Communication
 // NOTE: Make sure none of these flags are contained within the other flags, as it will mess up text parsing
-#define TEMP_FLAG "Temp:"    //                                                                       MUST MATCH PYTHON
-#define OXY_FLAG "Oxy:"      //                                                                       MUST MATCH PYTHON
-#define WATER_FLAG "Water:"  //                                                                       MUST MATCH PYTHON
+#define TEMP_FLAG "T<"   //                                                                       MUST MATCH PYTHON
+#define OXY_FLAG "O<"    //                                                                       MUST MATCH PYTHON
+#define WATER_FLAG "W<"  //                                                                       MUST MATCH PYTHON
 
 // For Cache System
-#define CACHE_LOG_FLAG "Log:"                 //                                                      MUST MATCH PYTHON
-#define REQUEST_RECIEVED_FLAG "Received"      //                                                      MUST MATCH PYTHON
-#define DATA_TRANSFER_SUCCESS_FLAG "Success"  //                                                      MUST MATCH PYTHON
+#define CACHE_LOG_FLAG "L:"                   //                                                  MUST MATCH PYTHON
+#define REQUEST_RECIEVED_FLAG "Received"      //                                                  MUST MATCH PYTHON
+#define DATA_TRANSFER_SUCCESS_FLAG "Success"  //                                                  MUST MATCH PYTHON
 #define CACHE_REQUEST_FLAG "Log_"
-#define CACHE_TIME_FLAG "Time:"  //                                                                   MUST MATCH PYTHON
+#define CACHE_TIME_FLAG "Time<"  //                                                               MUST MATCH PYTHON
 
 // Misc. Communication Flags
-#define DISPLAY_FLAG "Display_"        //                                                             MUST MATCH PYTHON
-#define DISPLAY_ERROR_MESSAGE "Error"  //                                                             MUST MATCH PYTHON
+#define DISPLAY_FLAG "Display_"        //                                                         MUST MATCH PYTHON
+#define DISPLAY_ERROR_MESSAGE "Error"  //                                                         MUST MATCH PYTHON
 
-#define END_FLAG "End"  //                                                                            MUST MATCH PYTHON
+#define END_FLAG ">"  //                                                                          MUST MATCH PYTHON
 
 // -------------------- Other Constants --------------------
 // ---------- May Be Changed ----------
@@ -53,7 +53,8 @@
 
 // For Cache System
 #define CACHE_CYCLE_DELAY 5000
-#define CACHE_MAX 300  // Should not be less than 4
+#define CACHE_MAX 50  // Should not be less than 4
+#define MAX_CACHE_ENTRY_SIZE 65
 
 #define OFFSCALE_HIGH_DISPLAY "HI"  // For displays when disconnected
 #define OFFSCALE_LOW_DISPLAY "LO"   // For displays when disconnected

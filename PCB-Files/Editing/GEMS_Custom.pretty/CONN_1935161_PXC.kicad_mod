@@ -1,7 +1,7 @@
 (footprint "CONN_1935161_PXC"
-	(version 20240108)
+	(version 20241229)
 	(generator "pcbnew")
-	(generator_version "8.0")
+	(generator_version "9.0")
 	(layer "F.Cu")
 	(tags "1935161 ")
 	(property "Reference" "REF**"
@@ -24,18 +24,6 @@
 		(effects
 			(font
 				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(property "Footprint" ""
-		(at 0 0 0)
-		(layer "F.Fab")
-		(hide yes)
-		(uuid "3f7f9070-4fe2-41e2-84ec-b1b10d118924")
-		(effects
-			(font
-				(size 1.27 1.27)
 				(thickness 0.15)
 			)
 		)
@@ -112,7 +100,7 @@
 			(width 0.508)
 			(type solid)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.SilkS")
 		(uuid "d4da1f88-6c4f-448a-8efa-3ce7ce0af83c")
 	)
@@ -203,7 +191,7 @@
 			(width 0.508)
 			(type solid)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.Fab")
 		(uuid "7963d192-e7fc-42b0-b9e2-6924c58f89e0")
 	)
@@ -248,15 +236,16 @@
 		(remove_unused_layers no)
 		(uuid "62b7297f-a3e6-4860-9354-308d1cb1f284")
 	)
-	(model "/Users/caseychiang/Downloads/1935161_ScrewTerminal/1935161.step"
+	(embedded_fonts no)
+	(model "/Users/caseychiang/Documents/GEMS-Project/1935161_ScrewTerminal/1935161.step"
 		(offset
-			(xyz 0 2.5 5.7)
+			(xyz 0 2.47 5.7)
 		)
 		(scale
 			(xyz 1 1 1)
 		)
 		(rotate
-			(xyz -90 0 0)
+			(xyz -90 -0 -0)
 		)
 	)
 )

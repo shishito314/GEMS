@@ -1,7 +1,7 @@
 (footprint "CONV_R-78K9.0-0.5"
-	(version 20240108)
+	(version 20241229)
 	(generator "pcbnew")
-	(generator_version "8.0")
+	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "REF**"
 		(at -3.175 -2.54 0)
@@ -21,18 +21,6 @@
 		(effects
 			(font
 				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(property "Footprint" ""
-		(at 0 0 0)
-		(layer "F.Fab")
-		(hide yes)
-		(uuid "90820d7a-06b5-4fd7-87a2-e7b87661e223")
-		(effects
-			(font
-				(size 1.27 1.27)
 				(thickness 0.15)
 			)
 		)
@@ -109,7 +97,7 @@
 			(width 0.2)
 			(type solid)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.SilkS")
 		(uuid "d07ac60e-b91f-49f2-9b2b-fdbf614d8acd")
 	)
@@ -200,7 +188,7 @@
 			(width 0.2)
 			(type solid)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.Fab")
 		(uuid "b5613e9d-8900-4761-97b7-2dd66ef45b9a")
 	)
@@ -244,7 +232,8 @@
 		(solder_mask_margin 0.102)
 		(uuid "ffff0fe1-2236-4665-b5b8-bff25f7f71e4")
 	)
-	(model "/Users/caseychiang/Downloads/R_78K9_0_0_5_DCDCConverter/R-78K9.0-0.5.step"
+	(embedded_fonts no)
+	(model "/Users/caseychiang/Documents/GEMS-Project/R_78K9_0_0_5 copy/R-78K9.0-0.5.step"
 		(offset
 			(xyz 0 0 0)
 		)
@@ -252,7 +241,7 @@
 			(xyz 1 1 1)
 		)
 		(rotate
-			(xyz -90 0 0)
+			(xyz -90 -0 -0)
 		)
 	)
 )

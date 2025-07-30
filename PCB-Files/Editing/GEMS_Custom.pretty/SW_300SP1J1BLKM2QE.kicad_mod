@@ -1,7 +1,7 @@
 (footprint "SW_300SP1J1BLKM2QE"
-	(version 20240108)
+	(version 20241229)
 	(generator "pcbnew")
-	(generator_version "8.0")
+	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "REF**"
 		(at -5.715 -3.175 0)
@@ -21,18 +21,6 @@
 		(effects
 			(font
 				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(property "Footprint" ""
-		(at 0 0 0)
-		(layer "F.Fab")
-		(hide yes)
-		(uuid "c0b8313e-38fb-4dee-a42c-2319d3cc7e2b")
-		(effects
-			(font
-				(size 1.27 1.27)
 				(thickness 0.15)
 			)
 		)
@@ -109,7 +97,7 @@
 			(width 0.2)
 			(type solid)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.SilkS")
 		(uuid "3c89b447-1f2f-476d-9649-87470680c1cf")
 	)
@@ -200,7 +188,7 @@
 			(width 0.2)
 			(type solid)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.Fab")
 		(uuid "fabe3a77-f0ce-4a10-94ab-052c57356a64")
 	)
@@ -244,15 +232,16 @@
 		(solder_mask_margin 0.102)
 		(uuid "383c6603-2fde-4045-bf94-d119759f7975")
 	)
-	(model "/Users/caseychiang/Downloads/300SP1J1BLKM2QE_RockerSwitch/300SP1J1BLKM2QE.step"
+	(embedded_fonts no)
+	(model "/Users/caseychiang/Documents/GEMS-Project/300SP1J1BLKM2QE_RockerSwitch/300SP1J1BLKM2QE.step"
 		(offset
-			(xyz 0 0 0)
+			(xyz 0 0 -0.5)
 		)
 		(scale
 			(xyz 1 1 1)
 		)
 		(rotate
-			(xyz -90 0 0)
+			(xyz -90 -0 -0)
 		)
 	)
 )

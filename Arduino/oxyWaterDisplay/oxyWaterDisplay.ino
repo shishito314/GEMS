@@ -19,6 +19,9 @@ unsigned long displayWaitMarker{ 0 };
 int status{ WL_IDLE_STATUS };
 WiFiServer server{ 80 };
 
+bool reconnecting = false;
+unsigned long reconnectStart = 0;
+
 // For 7 segment displays
 Adafruit_7segment tempDisplay{};
 Adafruit_7segment oxyDisplay{};
@@ -34,6 +37,13 @@ unsigned long cacheWaitMarker{ 0 };
 CircularCache cache{};
 
 // -------------------- Helper Functions --------------------
+// ---------- Memory Allocation ----------
+// Utility function to get free memory (SRAM)
+extern int __heap_start, *__brkval;
+int freeMemory() {
+  int v;
+  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+}
 // ---------- Text Parsing ----------
 String readFromUntil(const String &text, const String &flagStart, const String &flagEnd) {
   String prev = text.substring(0, flagStart.length());
@@ -224,6 +234,30 @@ void connectToWifi() {
   server.begin();     // start the web server on port 80
   printWifiStatus();  // you're connected now, so print out the status
 }
+void reconnectIfNeeded() {
+  if (WiFi.status() == WL_CONNECTED) {
+    reconnecting = false;
+    return;
+  }
+
+  if (!reconnecting) {
+    Serial.println("WiFi disconnected, attempting reconnect...");
+    WiFi.begin(NETWORK_SSID, NETWORK_PASS);
+    reconnectStart = millis();
+    reconnecting = true;
+  }
+
+  if (millis() - reconnectStart >= 3000) {
+    reconnecting = false;
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("WiFi reconnected.");
+      server.begin();
+      printWifiStatus();
+    } else {
+      Serial.println("WiFi reconnection failed.");
+    }
+  }
+}
 void handleWifi() {
   WiFiClient client = server.available();  // listen for incoming clients
   if (client) {                            // if you get a client,
@@ -293,6 +327,10 @@ void setup() {
   // Initialize Serial
   Serial.begin(9600);
 
+  // Print free memory
+  Serial.print("Free memory at startup: ");
+  Serial.println(freeMemory());
+
   // Initialize Segment Displays with I2C addresses
   tempDisplay.begin(TEMP_DISPLAY_ADDRESS);
   oxyDisplay.begin(OXY_DISPLAY_ADDRESS);
@@ -306,7 +344,10 @@ void setup() {
 }
 
 void loop() {
-  handleWifi();
+  reconnectIfNeeded();
+  if (!reconnecting) {
+    handleWifi();
+  }
 
   // ----- Adding to Cache -----
   if (millis() >= cacheWaitMarker) {

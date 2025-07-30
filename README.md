@@ -162,7 +162,7 @@ When changing constants in the programs, it is important to note that variables 
 
 ### Hardware
 
-#### [Bill Of Materials]([https://docs.google.com/spreadsheets/d/1ikpGfJ6LjHaBAVGgCHs3OJ50SzMK_VNal6e07bsFQgU/edit?usp=sharing])
+[Bill Of Materials]([https://docs.google.com/spreadsheets/d/1ikpGfJ6LjHaBAVGgCHs3OJ50SzMK_VNal6e07bsFQgU/edit?usp=sharing])
 
 #### Wifi Communications
 
@@ -242,6 +242,7 @@ When the display arduino gets disconnected, it will calculate the oxygen and hum
 - Logging untested with daylight savings time
 - Non-flexible file structure
 - Some computers may stop sending wifi requests when the computer screen turns off
+- No timeout in arduino sketch if client doesn't disconnect
 
 ## Links
 

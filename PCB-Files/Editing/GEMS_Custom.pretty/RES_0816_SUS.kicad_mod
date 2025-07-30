@@ -1,7 +1,7 @@
 (footprint "RES_0816_SUS"
-	(version 20240108)
+	(version 20241229)
 	(generator "pcbnew")
-	(generator_version "8.0")
+	(generator_version "9.0")
 	(layer "F.Cu")
 	(tags "RG1608P-221-B-T5 ")
 	(property "Reference" "REF**"
@@ -24,18 +24,6 @@
 		(effects
 			(font
 				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(property "Footprint" ""
-		(at 0 0 0)
-		(layer "F.Fab")
-		(hide yes)
-		(uuid "29efc225-7fd5-405f-8354-4443eef5c486")
-		(effects
-			(font
-				(size 1.27 1.27)
 				(thickness 0.15)
 			)
 		)
@@ -260,13 +248,13 @@
 	(pad "1" smd rect
 		(at -0.8266 0)
 		(size 0.5532 1)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(uuid "2afc2fe7-2b62-4d40-9599-55ad1832bc64")
 	)
 	(pad "2" smd rect
 		(at 0.8266 0)
 		(size 0.5532 1)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(uuid "cd232b1b-59be-48e9-8bdf-9f2a81e3dc17")
 	)
 	(zone
@@ -287,6 +275,10 @@
 			(copperpour not_allowed)
 			(footprints allowed)
 		)
+		(placement
+			(enabled no)
+			(sheetname "")
+		)
 		(fill
 			(thermal_gap 0.508)
 			(thermal_bridge_width 0.508)
@@ -297,7 +289,8 @@
 			)
 		)
 	)
-	(model "/Users/caseychiang/Downloads/RG1608P_221_B_T5_Resistor/RES_0816_SUS.step"
+	(embedded_fonts no)
+	(model "/Users/caseychiang/Documents/GEMS-Project/RG1608P_221_B_T5_Resistor/RES_0816_SUS.step"
 		(offset
 			(xyz 0 0 0)
 		)

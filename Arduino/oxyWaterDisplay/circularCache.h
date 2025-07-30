@@ -5,6 +5,7 @@
 
 class CircularCache {
 public:
+  CircularCache();
   String cache[CACHE_MAX];
   int cacheBegin{ 0 };
   int cacheEnd{ 0 };
@@ -15,6 +16,12 @@ public:
   void print();
   void clearOldCache();
 };
+
+CircularCache::CircularCache() {
+  for (int i = 0; i < CACHE_MAX; ++i) {
+    cache[i].reserve(MAX_CACHE_ENTRY_SIZE);  // Pre-allocate memory to prevent fragmentation
+  }
+}
 
 void CircularCache::add(const String& newCacheLog) {
   cache[cacheEnd] = newCacheLog;
