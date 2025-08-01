@@ -327,6 +327,8 @@ void setup() {
   // Initialize Serial
   Serial.begin(9600);
 
+  analogReference(EXTERNAL);
+
   // Print free memory
   Serial.print("Free memory at startup: ");
   Serial.println(freeMemory());

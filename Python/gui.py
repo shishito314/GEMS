@@ -8,7 +8,6 @@ Usage:
 When you wish to run the GUI, run this program. The program will stop
 when the GUI window is closed.
 """
-
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import font
@@ -33,7 +32,8 @@ window.resizable(False, False)
 # Styling for tab buttons
 guiStyle = ttk.Style()
 defaultFont = font.nametofont("TkDefaultFont").actual()
-guiStyle.configure("Selected.TButton", foreground="white", font=(defaultFont, defaultFont["size"], 'bold'))
+guiStyle.configure("Selected.TButton", foreground="white",
+                   font=(defaultFont, defaultFont["size"], 'bold'))
 guiStyle.configure("Unselected.TButton", foreground="white")
 
 guiTabSystem = gui.tab.TabSystem(window)
@@ -41,16 +41,18 @@ gloveboxTabSystem = gui.tab.TabSystem(window)
 sensorTabSystem = gui.tab.TabSystem(window)
 
 for glovebox in gems.gloveboxes:
-	gui.tab.GloveboxTab(glovebox, gloveboxTabSystem, guiTabSystem)
+    gui.tab.GloveboxTab(glovebox, gloveboxTabSystem, guiTabSystem)
 
 # -------------------- GUI Sections Initialization --------------------
 # The list of widgets is just things to pack_forget, so we only need the containers for the glovebox and sensor buttons
-gui.now.Now(window, guiTabSystem, gloveboxTabSystem, sensorTabSystem, defaultFont)
+gui.now.Now(window, guiTabSystem, gloveboxTabSystem,
+            sensorTabSystem, defaultFont)
 gui.log.Log(window, guiTabSystem, gloveboxTabSystem)
 gui.config.Config(window, guiTabSystem)
 
 # -------------------- Window Setup and Launch --------------------
-title = ttk.Label(master=window, text="Glovebox Environmental Monitoring System")
+title = ttk.Label(
+    master=window, text="Glovebox Environmental Monitoring System")
 title.pack()
 guiTabSystem.display()
 gloveboxTabSystem.currentTab.display()

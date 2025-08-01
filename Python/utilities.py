@@ -3,7 +3,6 @@ Description:
 ----------
 Various utility methods for use in other files.
 """
-
 import datetime
 from typing import List, Optional
 import os
@@ -68,17 +67,41 @@ def strToDate(string: str) -> datetime.date:
     """Converts string of format 'YYYY-MM-DD' to date."""
     return datetime.datetime.strptime(string, "%Y-%m-%d").date()
 
+def strToTime(string: str) -> datetime.time:
+    """Converts string of format 'HH:MM:SS.ssssss' or 'HH:MM:SS' to time."""
+    try:
+        return datetime.datetime.strptime(string, "%H:%M:%S.%f").time()
+    except:
+        return datetime.datetime.strptime(string, "%H:%M:%S").time()
+
 # -------------------- Miscellaneous Utilities --------------------
 def mapValue(l1: float, h1: float, l2: float, h2: float, val: float) -> float:
-    """Maps a value from one range to another."""
+    """Maps a value from range [l1, h1] to range [l2, h2]."""
     return (val - l1) / (h1 - l1) * (h2 - l2) + l2
-# takes any number of lists and returns a list formed by concatenating the given lists
-def listJoin(*args):
-	endList = args[0]
-	for i in range(1, len(args)):
-		endList.extend(args[i])
-	return endList
+
+def listJoin(*args: List) -> List:
+    """Takes any number of lists and returns a list formed by concatenating them."""
+    endList = args[0]
+    for i in range(1, len(args)):
+        endList.extend(args[i])
+    return endList
 
 def makeDirIfNotExist(path):
+    """Creates the given directory if it doesn't exist."""
     if not os.path.isdir(path):
-      os.mkdir(path)
+        os.mkdir(path)
+
+def getTimeDurationStr(minutes: int) -> str:
+    days = minutes // (60 * 24)
+    minutes %= (60 * 24)
+    hours = minutes // 60
+    minutes %= 60
+
+    parts = []
+    if days:
+        parts.append(f"{days} day{'s' if days != 1 else ''}")
+    if hours:
+        parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
+    parts.append(f"{minutes} min")
+
+    return ", ".join(parts)

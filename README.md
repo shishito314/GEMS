@@ -112,17 +112,16 @@ Arduino: IP: 192.168.0.112 Display: True Sensors: Oxy
 Arduino: IP: 192.168.0.113 Display: False Sensors: Temp
 ```
 
-It's important to note, the colons after words are mandatory.
+IMPORTANT: Capitalization and the colons after words are mandatory.
 
 ### Adding Sensors:
 
 Each sensor has a class in gems.py extended from the base Sensor class. To create your own, make a class extended from the base Sensor class and define the addVal and getLog methods for your sensor. It might look something like the following:
 
 ```python
-class newSensor(Sensor):
+class NewSensor(Sensor):
   flag = NEW_SENSOR_FLAG # Flag to be used in HTTP communications and logging
   datatype = float # The datatype of the sensor measurements (e.g. float)
-  logCharLimit = 5 # The number of characters allocated to the sensor's measurement in a line of the log file
 
   def __init__(self):
     super().__init__()
@@ -146,7 +145,7 @@ class newSensor(Sensor):
       else:
         return DISPLAY_ERROR_MESSAGE
 
-  def addVal(self, val):
+  def addVal(self, val, time):
     self.lastValue = val
 ```
 
@@ -234,8 +233,7 @@ When the display arduino gets disconnected, it will calculate the oxygen and hum
 ## Known Issues and Limitations
 
 - The Arduino clock isn't perfectly accurate, so after a while there may be slightly more or less logs than expected
-- Can get repeated logs if you wait a precise amount of time
-- Can miss a log if arduino restarted and measured at a precise time (unlikely)
+- Arduino timestamps leave small probability of missing or repeating a log
 - Can't support multiple sensors of the same type on one glovebox (because it can't differentiate flags)
 - Logging untested with daylight savings time
 - Non-flexible file structure
