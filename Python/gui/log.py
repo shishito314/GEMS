@@ -1,11 +1,13 @@
+import os
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import scrolledtext
 from typing import Dict, List
-import os
 
+import gems
 from gui.tab import *
 from utilities import *
+
 
 class Log(GuiTab):
     def __init__(self, window, guiTabSystem, gloveboxTabSystem):
@@ -39,7 +41,7 @@ class Log(GuiTab):
     def showLogFile(self, *_):
         folderName = self.folderVar.get()
         fileName = self.fileVar.get()
-        logFilePath = os.path.join(folderName, fileName)
+        logFilePath = os.path.join(gems.PATH_DIR, self.gloveboxTabSystem.currentTab.glovebox.name, folderName, fileName)
 
         if not os.path.exists(logFilePath):
             return
@@ -72,9 +74,10 @@ class Log(GuiTab):
         self.dirs.clear()
         self.files.clear()
 
-        walkResult = os.walk(f"./{self.gloveboxTabSystem.currentTab.glovebox.name}")
+        walkResult = os.walk(f"{gems.PATH_DIR}/{self.gloveboxTabSystem.currentTab.glovebox.name}")
 
         for dirPath, _, fileNames in walkResult:
+            dirPath = os.path.basename(dirPath)
             fileNames = [f for f in fileNames if not f.startswith('.')]
             if fileNames:
                 self.dirs.append(dirPath)

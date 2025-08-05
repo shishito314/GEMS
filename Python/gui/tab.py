@@ -3,6 +3,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from typing import List
 
+
 class TabSystem:
     def __init__(self, window):
         self.container = ttk.Frame(master=window, padding=3)

@@ -5,11 +5,14 @@ Architecture, setup, and processes for GEMS system.
 Configuration handled upon import according to the specified CONFIG_FILE.
 """
 import datetime
-import urllib.request
 import os
-from typing import Dict, List, Any, TextIO, Union
+import urllib.request
+from pathlib import Path
+from typing import Any, Dict, List, TextIO, Union
 
 from utilities import *
+
+PATH_DIR = Path(__file__).parent
 
 # -------------------- Constants (Must Match Arduino) --------------------
 # Note: for text parsing, flags must contain no spaces
@@ -264,7 +267,7 @@ class Arduino:
 
     def getInternalFilePath(self):
         """Returns the path to the internal directory for this Arduino."""
-        return f"./{INTERNAL_DIR}/arduino{str(self.arduinoIndex)}.txt"
+        return f"{PATH_DIR}/{INTERNAL_DIR}/arduino{str(self.arduinoIndex)}.txt"
 
     def update(self):
         """Requests and stores the new values from the arduino."""
@@ -294,7 +297,7 @@ class Arduino:
         self.millisReference = int(readFromUntil(
             timeHeader, CACHE_TIME_FLAG, END_FLAG))
 
-        makeDirIfNotExist("./" + INTERNAL_DIR)
+        makeDirIfNotExist(f"{PATH_DIR}/{INTERNAL_DIR}")
         internalFileName = self.getInternalFilePath()
         if os.path.isfile(internalFileName):
             with open(internalFileName, "r") as internalFile:
@@ -377,19 +380,19 @@ class Glovebox:
 
     def getSensorFolderPath(self, sensorType: Union[Sensor, type[Sensor]]) -> str:
         """Returns the folder for the log files of the specified glovebox and sensor"""
-        return f"./{self.name}/{SENSOR_FOLDER_NAMES[sensorType.flag]}"
+        return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensorType.flag]}"
 
     def getErrorFolderPath(self) -> str:
         """Returns the folder for the error files of this glovebox"""
-        return f"./{self.name}/{ERROR_LOG_FOLDER}"
+        return f"{PATH_DIR}/{self.name}/{ERROR_LOG_FOLDER}"
 
     def getLogFilePathWithDateTime(self, dateTime: datetime.datetime, sensor: Union[Sensor, type[Sensor]]):
         """Returns the log file for this glovebox and the given datetime"""
-        return f"./{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}/{LOG_FILE_PREFIX}{str(dateTime)[0:10]}.txt"
+        return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}/{LOG_FILE_PREFIX}{str(dateTime)[0:10]}.txt"
 
     def getErrorLogPathWithDateTime(self, dateTime: datetime.datetime):
         """Returns the error file for this glovebox and the given datetime"""
-        return f"./{self.name}/{ERROR_LOG_FOLDER}/{ERROR_LOG_PREFIX}{str(dateTime)[0:10]}.txt"
+        return f"{PATH_DIR}/{self.name}/{ERROR_LOG_FOLDER}/{ERROR_LOG_PREFIX}{str(dateTime)[0:10]}.txt"
 
     def update(self):
         """Gets new sensor values, logs them, and sends display values"""
@@ -404,11 +407,11 @@ class Glovebox:
             return
 
         # Log data
-        makeDirIfNotExist("./" + self.name)
+        makeDirIfNotExist(f"{PATH_DIR}/{self.name}")
 
         for sensor in self.allSensors:
             makeDirIfNotExist(
-                f"./{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}")
+                f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}")
 
             for log in allNewData:
                 if log[sensor.flag]:
@@ -498,9 +501,10 @@ gloveboxes: List[Glovebox] = []  # List of all gloveboxes
 gloveboxNames: List[str] = []
 
 # Fail if no config file
-assert os.path.exists(CONFIG_FILE), f"Config file \"{CONFIG_FILE}\" not found."
+CONFIG_PATH = os.path.join(PATH_DIR, CONFIG_FILE)
+assert os.path.exists(CONFIG_PATH), f"Config file \"{CONFIG_PATH}\" not found."
 
-with open(CONFIG_FILE, "r") as configFile:
+with open(f"{CONFIG_PATH}", "r") as configFile:
     configFileStr = configFile.read()
 # File Parsing
 configBoxes = configFileStr.split(CONFIG_GLOVEBOX_FLAG)
@@ -544,4 +548,4 @@ for configBox in configBoxes:
     gloveboxNames.append(name)
 
 # Fail if no gloveboxes
-assert gloveboxes, f"No gloveboxes parsed from config file \"{CONFIG_FILE}.\""
+assert gloveboxes, f"No gloveboxes parsed from config file \"{CONFIG_PATH}.\""

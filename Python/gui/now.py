@@ -1,11 +1,12 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 import data
 import gems
 from gui.tab import *
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
+                                               NavigationToolbar2Tk)
+from matplotlib.figure import Figure
 from utilities import *
 
 MAX_TIME = 14400

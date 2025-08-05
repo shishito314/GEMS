@@ -19,13 +19,13 @@ For example, to get the list of Temperature measurements, you could write data[T
 For all data functions, the flag "keepErrors" decides whether or not to keep logs that can't be converted
 to the sensorType's datatype (e.g. "HIGH" and "LOW"). If true, they will be put into the data as raw strings.
 """
-import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
-from typing import Union
 import datetime
 import os
+from typing import Union
 
+import matplotlib.pyplot as plt
 from gems import *
+from matplotlib.axes import Axes
 
 # -------------------- Constants --------------------
 DATA_TIME_KEY = "Time"
@@ -33,7 +33,7 @@ DATA_MEASUREMENT_KEY = "Data"
 DATA_ERROR_KEY = "Error"
 
 # ---------- Data Utility Functions ----------
-def getLastNMeasurements(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], numEntries: int, keepErrors=False) -> Dict[str, List]:
+def getRecentData(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], numEntries: int, keepErrors=False) -> Dict[str, List]:
     """Gets data from the last [numEntries] entries"""
     data = {DATA_TIME_KEY: [], DATA_MEASUREMENT_KEY: []}
 
@@ -70,55 +70,13 @@ def getLastNMeasurements(glovebox: Glovebox, sensorType: Union[Sensor, type[Sens
 
     return data
 
-def getLastNMeasurementsAllSensors(glovebox: Glovebox, numEntries: int, keepErrors=False) -> Dict[str, Dict[str, List]]:
-    """get data for all sensors from the last [numEntries] entries. logFile defaults to None, signifying the logFile for the current date"""
+def getRecentDataAllSensors(glovebox: Glovebox, numEntries: int, keepErrors=False) -> Dict[str, Dict[str, List]]:
+    """get data for all sensors from the last [numEntries] entries"""
     data = {}
     for sensor in glovebox.allSensors:
-        data[sensor.flag] = getLastNMeasurements(
+        data[sensor.flag] = getRecentData(
             glovebox, numEntries, sensor, keepErrors
         )
-    return data
-
-def getLastMeasurement(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], keepErrors=False) -> Dict[str, Any]:
-    """Gets the last measurement taken for the given glovebox and sensor."""
-    data = {DATA_TIME_KEY: None, DATA_MEASUREMENT_KEY: None}
-
-    sensorFolder = glovebox.getSensorFolderPath(sensorType)
-    if not os.path.isdir(sensorFolder):
-        return data
-    logFiles = sorted(
-        [f for f in os.listdir(sensorFolder) if isLogFile(f)], reverse=True
-    )
-
-    for logFileName in logFiles:
-        logFileDate = getDateFromLogFileName(logFileName)
-        with open(os.path.join(sensorFolder, logFileName)) as log:
-            lines = reversed(log.readlines())
-        for line in lines:
-            try:
-                dateTime = datetime.datetime.combine(
-                    logFileDate, getTimeFromLogLine(line)
-                )
-                rawStr = removeSpaces(readFrom(line, " "))
-                try:
-                    measurement = sensorType.datatype(rawStr)
-                except:
-                    if not keepErrors:
-                        continue
-                    measurement = rawStr
-
-                data[DATA_TIME_KEY] = dateTime
-                data[DATA_MEASUREMENT_KEY] = measurement
-                return data
-            except:
-                continue
-
-    return data
-
-def getLastMeasurementAllSensors(glovebox: Glovebox, keepErrors=False) -> Dict[str, Dict[str, Any]]:
-    data = {}
-    for sensor in glovebox.allSensors:
-        data[sensor.flag] = getLastMeasurement(glovebox, sensor, keepErrors)
     return data
 
 def getDataByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime, keepErrors=False) -> Dict[str, List]:
@@ -175,6 +133,222 @@ def getDataByTimeAllSensors(glovebox: Glovebox, startTime: datetime.datetime, en
         data[sensor.flag] = getDataByTime(
             glovebox, startTime, endTime, sensor, keepErrors
         )
+    return data
+
+def getLastMeasurement(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], keepErrors=False) -> Dict[str, Any]:
+    """Gets the last measurement taken for the given glovebox and sensor."""
+    data = {DATA_TIME_KEY: None, DATA_MEASUREMENT_KEY: None}
+
+    sensorFolder = glovebox.getSensorFolderPath(sensorType)
+    if not os.path.isdir(sensorFolder):
+        return data
+    logFiles = sorted(
+        [f for f in os.listdir(sensorFolder) if isLogFile(f)], reverse=True
+    )
+
+    for logFileName in logFiles:
+        logFileDate = getDateFromLogFileName(logFileName)
+        with open(os.path.join(sensorFolder, logFileName)) as log:
+            lines = reversed(log.readlines())
+        for line in lines:
+            try:
+                dateTime = datetime.datetime.combine(
+                    logFileDate, getTimeFromLogLine(line)
+                )
+                rawStr = removeSpaces(readFrom(line, " "))
+                try:
+                    measurement = sensorType.datatype(rawStr)
+                except:
+                    if not keepErrors:
+                        continue
+                    measurement = rawStr
+
+                data[DATA_TIME_KEY] = dateTime
+                data[DATA_MEASUREMENT_KEY] = measurement
+                return data
+            except:
+                continue
+
+    return data
+
+def getLastMeasurementAllSensors(glovebox: Glovebox, keepErrors=False) -> Dict[str, Dict[str, Any]]:
+    """Gets the last measurement taken for the given glovebox and all sensors."""
+    data = {}
+    for sensor in glovebox.allSensors:
+        data[sensor.flag] = getLastMeasurement(glovebox, sensor, keepErrors)
+    return data
+
+def getMeasurementNearTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], dateTime: datetime.datetime, keepErrors=False) -> Dict[str, Any]:
+    """Gets the measurement taken closest to the given time for the given glovebox and sensor."""
+    def getDataFromLine(line):
+        try:
+            time = getTimeFromLogLine(line)
+            rawStr = removeSpaces(readFrom(line, " "))
+            try:
+                measurement = sensorType.datatype(rawStr)
+            except:
+                if not keepErrors:
+                    return None, None
+                measurement = rawStr
+
+            return time, measurement
+        except:
+            return None, None
+    
+    def findFirstEntry(lines) -> tuple[datetime.time, Any, int]:
+        entryTime = None
+        entryMeasurement = None
+        index = 0
+        while not (entryTime and entryMeasurement != None) and index < len(lines):
+            entryTime, entryMeasurement = getDataFromLine(lines[index])
+            index += 1
+        return entryTime, entryMeasurement
+
+    def findLastEntry(lines) -> tuple[datetime.time, int]:
+        entryTime = None
+        entryMeasurement = None
+        index = len(lines) - 1
+        while not (entryTime and entryMeasurement != None) and index >= 0:
+            entryTime, entryMeasurement = getDataFromLine(lines[index])
+            index -= 1
+        return entryTime, entryMeasurement
+    
+    def searchNeighborFile(dateTime, sensorFolder, logFiles, fileIndex, isBefore):
+        newFileLastTime = None
+        newFileLastMeasurement = None
+        newFileDate = None
+        newFileLastDatetime = None
+        offset = None
+        while not (newFileLastTime and newFileLastMeasurement != None) and 0 <= fileIndex < len(logFiles):
+            with open(os.path.join(sensorFolder, logFiles[fileIndex])) as log:
+                lines = log.readlines()
+            newFileLastTime, newFileLastMeasurement = findLastEntry(lines) if isBefore else findFirstEntry(lines)
+            fileIndex += -1 if isBefore else 1
+        fileIndex += 1 if isBefore else -1
+        if 0 <= fileIndex < len(logFiles) and newFileLastTime:
+            newFileDate = getDateFromLogFileName(logFiles[fileIndex])
+            newFileLastDatetime = datetime.datetime.combine(newFileDate, newFileLastTime)
+            offset = dateTime - newFileLastDatetime
+        return offset, newFileLastDatetime, newFileLastMeasurement
+
+    def getNearestEntryFromNeighborFiles(dateTime, sensorFolder, logFiles, prevIndex, nextIndex):
+        data = {DATA_TIME_KEY: None, DATA_MEASUREMENT_KEY: None}
+        beforeOffset, prevFileLastDatetime, prevFileLastMeasurement = searchNeighborFile(dateTime, sensorFolder, logFiles, prevIndex, True)
+        afterOffset, nextFileFirstDatetime, nextFileFirstMeasurement = searchNeighborFile(dateTime, sensorFolder, logFiles, nextIndex, False)
+
+        if beforeOffset and afterOffset:
+            if abs(beforeOffset) < abs(afterOffset):
+                data[DATA_TIME_KEY] = prevFileLastDatetime
+                data[DATA_MEASUREMENT_KEY] = prevFileLastMeasurement
+            else:
+                data[DATA_TIME_KEY] = nextFileFirstDatetime
+                data[DATA_MEASUREMENT_KEY] = nextFileFirstMeasurement
+        elif beforeOffset:
+            data[DATA_TIME_KEY] = prevFileLastDatetime
+            data[DATA_MEASUREMENT_KEY] = prevFileLastMeasurement
+        elif afterOffset:
+            data[DATA_TIME_KEY] = nextFileFirstDatetime
+            data[DATA_MEASUREMENT_KEY] = nextFileFirstMeasurement
+        return data
+
+    data = {DATA_TIME_KEY: None, DATA_MEASUREMENT_KEY: None}
+
+    sensorFolder = glovebox.getSensorFolderPath(sensorType)
+    if not os.path.isdir(sensorFolder):
+        return data
+    logFiles = sorted(
+        [f for f in os.listdir(sensorFolder) if isLogFile(f)]
+    )
+
+    logFileForTime = os.path.basename(glovebox.getLogFilePathWithDateTime(dateTime, sensorType))
+    if logFileForTime in logFiles:
+        logFileName = logFileForTime
+        logFileDate = getDateFromLogFileName(logFileName)
+        with open(os.path.join(sensorFolder, logFileName)) as log:
+            lines = log.readlines()
+
+        firstTime, firstMeasurement = findFirstEntry(lines)
+        lastTime, lastMeasurement = findLastEntry(lines)
+
+        if not (firstTime and firstMeasurement != None):
+            prevIndex = logFiles.index(logFileName) - 1
+            nextIndex = logFiles.index(logFileName) + 1
+            return getNearestEntryFromNeighborFiles(dateTime, sensorFolder, logFiles, prevIndex, nextIndex)
+
+        if firstTime > dateTime.time():
+            prevIndex = logFiles.index(logFileName) - 1
+            if prevIndex >= 0:
+                prevFileDate = getDateFromLogFileName(logFiles[prevIndex])
+                with open(os.path.join(sensorFolder, logFiles[prevIndex])) as log:
+                    prevFileLines = log.readlines()
+                timeOffset = firstTime - dateTime.time()
+                prevFileLastTime, prevFileLastMeasurement = findLastEntry(prevFileLines)
+                if prevFileLastTime and prevFileLastMeasurement != None:
+                    prevFileLastDatetime = datetime.datetime.combine(prevFileDate, prevFileLastTime)
+                    if dateTime - prevFileLastDatetime < timeOffset:
+                        data[DATA_TIME_KEY] = prevFileLastDatetime
+                        data[DATA_MEASUREMENT_KEY] = prevFileLastMeasurement
+                        return data
+            data[DATA_TIME_KEY] = datetime.datetime.combine(logFileDate, firstTime)
+            data[DATA_MEASUREMENT_KEY] = firstMeasurement
+            return data
+
+        elif lastTime < dateTime.time():
+            nextIndex = logFiles.index(logFileName) + 1
+            if nextIndex < len(logFiles):
+                nextFileDate = getDateFromLogFileName(logFiles[nextIndex])
+                with open(os.path.join(sensorFolder, logFiles[nextIndex])) as log:
+                    nextFileLines = log.readlines()
+                timeOffset = dateTime.time() - lastTime
+                nextFileFirstTime, nextFileFirstMeasurement = findFirstEntry(nextFileLines)
+                if nextFileFirstTime and nextFileFirstMeasurement != None:
+                    nextFileFirstDatetime = datetime.datetime.combine(nextFileDate, nextFileFirstTime)
+                    if nextFileFirstDatetime - dateTime <= timeOffset:
+                        data[DATA_TIME_KEY] = nextFileFirstDatetime
+                        data[DATA_MEASUREMENT_KEY] = nextFileFirstMeasurement
+                        return data
+            data[DATA_TIME_KEY] = datetime.datetime.combine(logFileDate, lastTime)
+            data[DATA_MEASUREMENT_KEY] = lastMeasurement
+            return data
+            
+        else:
+            # not doing binary search because of malformed line risk
+            minimumOffset = datetime.timedelta(days=1, hours=1) # 25 hours
+            closestTime = None
+            closestTimeMeasurement = None
+            for line in lines:
+                timeOfDay, measurement = getDataFromLine(line)
+                time = datetime.datetime.combine(logFileDate, timeOfDay)
+                if time and measurement != None:
+                    offset = abs(time - dateTime)
+                    if offset > minimumOffset: # passed the closest element
+                        break
+                    minimumOffset = offset
+                    closestTime = time
+                    closestTimeMeasurement = measurement
+            
+            if not closestTime:
+                prevIndex = logFiles.index(logFileName) - 1
+                nextIndex = logFiles.index(logFileName) + 1
+                return getNearestEntryFromNeighborFiles(dateTime, sensorFolder, logFiles, prevIndex, nextIndex)
+
+            data[DATA_TIME_KEY] = closestTime
+            data[DATA_MEASUREMENT_KEY] = closestTimeMeasurement
+            return data
+        
+    else:
+        nextIndex = 0
+        for i in range(0,len(logFiles) + 1):
+            nextIndex = i
+            if nextIndex < len(logFiles) and getDateFromLogFileName(logFiles[i]) > dateTime.date():
+                break
+        prevIndex = nextIndex - 1
+        return getNearestEntryFromNeighborFiles(dateTime, sensorFolder, logFiles, prevIndex, nextIndex)
+        
+def getMeasurementNearTimeAllSensors(glovebox: Glovebox, dateTime: datetime.datetime, keepErrors=False) -> Dict[str, Dict[str, Any]]:
+    data = {}
+    for sensor in glovebox.allSensors:
+        data[sensor.flag] = getMeasurementNearTime(glovebox, sensor, dateTime, keepErrors)
     return data
 
 def getErrorsByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime) -> Dict[str, List[Union[datetime.datetime, str]]]:
@@ -303,3 +477,27 @@ def subPlotErrors(subPlot: Axes, errors, **plotFormat):
     else:
         for time in times:
             subPlot.axvline(time, **plotFormat)
+
+# -------------------- Misc --------------------
+def verifyFile(filePath, sensorType: Union[Sensor, type[Sensor]], keepErrors=False) -> bool:
+    """Verify that the given file can be parsed for data."""
+    if not os.path.exists(filePath):
+        raise ValueError("Invalid file path")
+    logFileDate = getDateFromLogFileName(os.path.basename(filePath))
+    with open(filePath) as log:
+        for line in log:
+            try:
+                _ = datetime.datetime.combine(
+                    logFileDate, getTimeFromLogLine(line)
+                )
+
+                rawStr = removeSpaces(readFrom(line, " "))
+                try:
+                    _ = sensorType.datatype(rawStr)
+                except:
+                    if not keepErrors:
+                        return False
+
+            except:
+                return False
+    return True

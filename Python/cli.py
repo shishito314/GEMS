@@ -7,6 +7,7 @@ to interact with the GEMS system. Functionality may be added as needed or desire
 import data
 import gems
 
+
 # Commands
 def printHelp(_):
     print("Here are the possible commands:")

@@ -13,11 +13,11 @@ import tkinter.ttk as ttk
 from tkinter import font
 
 import gems
-from utilities import *
-import gui.now
-import gui.log
 import gui.config
+import gui.log
+import gui.now
 import gui.tab
+from utilities import *
 
 # -------------------- Constants --------------------
 WINDOW_WIDTH = 800

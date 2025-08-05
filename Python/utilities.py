@@ -4,8 +4,9 @@ Description:
 Various utility methods for use in other files.
 """
 import datetime
-from typing import List, Optional
 import os
+from typing import List, Optional
+
 
 # -------------------- Text Parsing Utilities --------------------
 def readFromUntil(text: str, flagStart: str, flagEnd: str) -> str:
@@ -30,21 +31,6 @@ def readUntil(text: str, flag: str) -> str:
     """Returns text up to the first occurrence of flag."""
     idx = text.find(flag)
     return text[:idx] if idx != -1 else text
-
-def readFromUntilFlags(text: str, flagStart: str, flagsEnd: List[str]) -> str:
-    """Gets the text starting after flagStart and ending at the first of any flagsEnd."""
-    startIdx = text.find(flagStart)
-    if startIdx == -1:
-        return ''
-    startIdx += len(flagStart)
-
-    endIdx = len(text)
-    for flag in flagsEnd:
-        idx = text.find(flag, startIdx)
-        if 0 <= idx < endIdx:
-            endIdx = idx
-
-    return text[startIdx:endIdx]
 
 def readFrom(text: str, flag: str) -> str:
     """Returns text after the first occurrence of flag."""

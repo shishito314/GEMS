@@ -37,7 +37,7 @@ class Config(GuiTab):
 
     def saveConfig(self):
         text = self.configText.get("1.0", "end-1c")
-        with open(gems.CONFIG_FILE, "w") as log:
+        with open(gems.CONFIG_PATH, "w") as log:
             log.write(text)
 
     def showHelp(self):
@@ -57,7 +57,7 @@ class Config(GuiTab):
 
     def displayFunc(self):
         self.configText.delete('1.0', tk.END)
-        with open(gems.CONFIG_FILE) as file:
+        with open(gems.CONFIG_PATH) as file:
             fileText = file.read()
         self.configText.insert(tk.END, fileText)
         self.configText.pack()
