@@ -32,7 +32,7 @@ to the sensorType's datatype (e.g. "HIGH" and "LOW"). If true, they will be put 
 """
 import datetime
 import os
-from typing import Union, Any
+from typing import Any, Type, Union
 
 import matplotlib.pyplot as plt
 from gems import *
@@ -57,7 +57,7 @@ def parseLine(line, sensorType, keepErrors) -> tuple[datetime.datetime, Any]:
 
     return dateTime, measurement
 
-def getRecentData(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], numEntries: int, keepErrors=False) -> Dict[str, List]:
+def getRecentData(glovebox: Glovebox, sensorType: Union[Sensor, Type[Sensor]], numEntries: int, keepErrors=False) -> Dict[str, List]:
     """Gets data from the last [numEntries] entries"""
     data = {DATA_TIME_KEY: [], DATA_MEASUREMENT_KEY: []}
 
@@ -94,7 +94,7 @@ def getRecentDataAllSensors(glovebox: Glovebox, numEntries: int, keepErrors=Fals
         )
     return data
 
-def getDataByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime, keepErrors=False) -> Dict[str, List]:
+def getDataByTime(glovebox: Glovebox, sensorType: Union[Sensor, Type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime, keepErrors=False) -> Dict[str, List]:
     """Gets data from the given start time to the endTime. startTime is inclusive, endTime is exclusive."""
     startTime = startTime.astimezone(datetime.timezone.utc)
     endTime = endTime.astimezone(datetime.timezone.utc)
@@ -143,7 +143,7 @@ def getDataByTimeAllSensors(glovebox: Glovebox, startTime: datetime.datetime, en
         )
     return data
 
-def getLastMeasurement(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], keepErrors=False) -> Dict[str, Any]:
+def getLastMeasurement(glovebox: Glovebox, sensorType: Union[Sensor, Type[Sensor]], keepErrors=False) -> Dict[str, Any]:
     """Gets the last measurement taken for the given glovebox and sensor."""
     data = {DATA_TIME_KEY: None, DATA_MEASUREMENT_KEY: None}
 
@@ -177,7 +177,7 @@ def getLastMeasurementAllSensors(glovebox: Glovebox, keepErrors=False) -> Dict[s
         data[sensor.flag] = getLastMeasurement(glovebox, sensor, keepErrors)
     return data
 
-def getMeasurementNearTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], dateTime: datetime.datetime, keepErrors=False) -> Dict[str, Any]:
+def getMeasurementNearTime(glovebox: Glovebox, sensorType: Union[Sensor, Type[Sensor]], dateTime: datetime.datetime, keepErrors=False) -> Dict[str, Any]:
     """Gets the measurement taken closest to the given time for the given glovebox and sensor."""
     dateTime = dateTime.astimezone(datetime.timezone.utc)
     
@@ -324,7 +324,7 @@ def getMeasurementNearTimeAllSensors(glovebox: Glovebox, dateTime: datetime.date
         data[sensor.flag] = getMeasurementNearTime(glovebox, sensor, dateTime, keepErrors)
     return data
 
-def getErrorsByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime) -> Dict[str, List[Union[datetime.datetime, str]]]:
+def getErrorsByTime(glovebox: Glovebox, sensorType: Union[Sensor, Type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime) -> Dict[str, List[Union[datetime.datetime, str]]]:
     """Gets errors from the given start time to the endTime. startTime is inclusive, endTime is exclusive"""
     startTime = startTime.astimezone(datetime.timezone.utc)
     endTime = endTime.astimezone(datetime.timezone.utc)
@@ -450,7 +450,7 @@ def subPlotErrors(subPlot: Axes, errors, **plotFormat):
             subPlot.axvline(time, **plotFormat)
 
 # -------------------- Misc --------------------
-def verifyFile(filePath, sensorType: Union[Sensor, type[Sensor]], keepErrors=False) -> bool:
+def verifyFile(filePath, sensorType: Union[Sensor, Type[Sensor]], keepErrors=False) -> bool:
     """Verify that the given file can be parsed for data."""
     if not os.path.exists(filePath):
         raise ValueError("Invalid file path")

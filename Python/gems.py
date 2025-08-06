@@ -8,7 +8,7 @@ import datetime
 import os
 import urllib.request
 from pathlib import Path
-from typing import Any, Dict, List, TextIO, Union
+from typing import Any, Dict, List, TextIO, Type, Union
 
 from utilities import *
 
@@ -356,28 +356,28 @@ class Glovebox:
         for i in range(0, len(self.arduinos)):
             self.arduinos[i].setGlovebox(self)
 
-    def makeLogLine(self, data: Dict[str, Union[datetime.datetime, Any]], sensor: Union[Sensor, type[Sensor]]):
+    def makeLogLine(self, data: Dict[str, Union[datetime.datetime, Any]], sensor: Union[Sensor, Type[Sensor]]):
         """Returns the string for a new line of the log file given the passed data. Takes UTC time."""
-        unixTimeStr = str(round(data[CACHE_TIME_FLAG].timestamp(), LOG_TIME_PRECISION))
-        localTimeStr += getTimeStr(data[CACHE_TIME_FLAG].astimezone())
+        unixTimeStr = str(int(round(data[CACHE_TIME_FLAG].timestamp(), LOG_TIME_PRECISION)))
+        localTimeStr = getTimeStr(data[CACHE_TIME_FLAG].astimezone())
         line = f"{unixTimeStr} {localTimeStr} : {data[sensor.flag]}\n"
         return line
 
-    def writeNewLogLine(self, logFile: TextIO, data: Dict[str, Any], sensor: Union[Sensor, type[Sensor]]):
+    def writeNewLogLine(self, logFile: TextIO, data: Dict[str, Any], sensor: Union[Sensor, Type[Sensor]]):
         """Writes a new line in the log file for the passed data."""
         logFile.write(self.makeLogLine(data, sensor))
 
     def writeError(self, dateTime: datetime.datetime, sensorsAffected: List[Sensor], message: str):
         """Writes an error to the error log file. Takes UTC time."""
         makeDirIfNotExist(self.getErrorFolderPath())
-        unixTimeStr = str(round(dateTime.timestamp(), LOG_TIME_PRECISION))
-        localTimeStr += getTimeStr(dateTime.astimezone())
-        sensorsStr = f"[{" ".join([sensor.__class__.__name__ for sensor in sensorsAffected])}]"
+        unixTimeStr = str(int(round(dateTime.timestamp(), LOG_TIME_PRECISION)))
+        localTimeStr = getTimeStr(dateTime.astimezone())
+        sensorsStr = f"[{' '.join([sensor.__class__.__name__ for sensor in sensorsAffected])}]"
 
         with open(self.getErrorLogPathWithDateTime(dateTime.astimezone()), "a") as file:
             file.write(f"{unixTimeStr} {localTimeStr} {sensorsStr} {message}")
 
-    def getSensorFolderPath(self, sensorType: Union[Sensor, type[Sensor]]) -> str:
+    def getSensorFolderPath(self, sensorType: Union[Sensor, Type[Sensor]]) -> str:
         """Returns the folder for the log files of the specified glovebox and sensor"""
         return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensorType.flag]}"
 
@@ -385,7 +385,7 @@ class Glovebox:
         """Returns the folder for the error files of this glovebox"""
         return f"{PATH_DIR}/{self.name}/{ERROR_LOG_FOLDER}"
 
-    def getLogFilePathWithDateTime(self, dateTime: datetime.datetime, sensor: Union[Sensor, type[Sensor]]):
+    def getLogFilePathWithDateTime(self, dateTime: datetime.datetime, sensor: Union[Sensor, Type[Sensor]]):
         """Returns the log file for this glovebox and the given datetime"""
         return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}/{LOG_FILE_PREFIX}{str(dateTime.astimezone())[0:10]}.txt"
 
