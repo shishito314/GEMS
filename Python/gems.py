@@ -38,8 +38,7 @@ DISPLAY_ERROR_MESSAGE = "Error"                                                 
 END_FLAG = ">" # For Text Parsing                                                             # MUST MATCH ARDUINO
 
 # -------------------- Other Constants --------------------
-DATETIME_STR_LENGTH = 8
-# 8 is second precision, 10 is tenth second, 11 hundredth, and so on.
+LOG_TIME_PRECISION = 0
 
 CYCLE_TIMING = 60 # Timing between sending http requests and updating display values
 HTTP_WAIT_TIME = 20 # Timeout for an HTTP Request
@@ -69,6 +68,9 @@ OFFSCALE_LOW_MSSG = "LOW"
 HTTP_REQUEST_FAIL = "Request Failed"
 
 # ---------- SHOULD NOT CHANGE ----------
+DATETIME_STR_LENGTH = 8 + LOG_TIME_PRECISION + (1 if LOG_TIME_PRECISION else 0)
+# 8 is second precision, 10 is tenth second, 11 hundredth, and so on.
+
 CONFIG_FILE = "config.txt"
 INTERNAL_DIR = ".internal" # Keeps track of timestamps so they persist between executions of the python script
 ERROR_LOG_PREFIX = "errorLog_"
@@ -250,32 +252,32 @@ class Arduino:
         for sensor in self.sensors:
             sensor.setGlovebox(glovebox)
 
-    def request(self, message: str):
+    def request(self, message: str) -> str:
         try:
             return str(urllib.request.urlopen(self.url + message, timeout=HTTP_WAIT_TIME).read())
         except:
-            self.glovebox.writeError(datetime.datetime.now(
-            ), self.sensors, f"No HTTP response: {self.url}{message}")
+            self.glovebox.writeError(datetime.datetime.now(datetime.timezone.utc),
+                self.sensors, f"No HTTP response: {self.url}{message}")
             return HTTP_REQUEST_FAIL
 
-    def convertMillisToDatetimeBefore(self, millis: int):
+    def convertMillisToDatetimeBefore(self, millis: int) -> datetime.datetime:
         """Converts a millis value from Arduino to a datetime, as long as the datetime is before the Arduino's millisReference."""
         if millis > self.millisReference:
             # 4,294,967,295 is the maximum for a uint32_t, which millis is stored as on the arduino
             millis -= 4294967295
         return self.dateTimeReference + datetime.timedelta(milliseconds=millis - self.millisReference)
 
-    def getInternalFilePath(self):
+    def getInternalFilePath(self) -> str:
         """Returns the path to the internal directory for this Arduino."""
         return f"{PATH_DIR}/{INTERNAL_DIR}/arduino{str(self.arduinoIndex)}.txt"
 
     def update(self):
         """Requests and stores the new values from the arduino."""
         self.newData = []
-        timeBefore = datetime.datetime.now()
+        timeBefore = datetime.datetime.now(datetime.timezone.utc)
         page = self.request(
             CACHE_REQUEST_FLAG + (DATA_TRANSFER_SUCCESS_FLAG if self.lastRequestSuccess else ""))
-        timeAfter = datetime.datetime.now()
+        timeAfter = datetime.datetime.now(datetime.timezone.utc)
         # Approximation for the time the arduino sent response back
         timeAt = timeBefore + ((timeAfter - timeBefore) / 2)
         if (page == HTTP_REQUEST_FAIL) or (not REQUEST_RECEIVED_FLAG in page):
@@ -310,8 +312,7 @@ class Arduino:
             internalFile.seek(0)
             internalFile.truncate()
 
-        for i in range(0, len(pageLogs)):
-            log = pageLogs[i]
+        for log in pageLogs:
             dictionary = {}
             arduinoTimeStr = readFromUntilRequireEnd(
                 log, CACHE_TIME_FLAG, END_FLAG)
@@ -334,13 +335,13 @@ class Arduino:
             dictionary[CACHE_TIME_FLAG] = self.convertMillisToDatetimeBefore(
                 arduinoTime)
 
-            for i in range(0, len(self.sensors)):
-                if not self.sensors[i].flag in log:
+            for sensor in self.sensors:
+                if not sensor.flag in log:
                     continue
-                val = readFromUntil(log, self.sensors[i].flag, END_FLAG)
-                self.sensors[i].addVal(self.sensors[i].datatype(
+                val = readFromUntil(log, sensor.flag, END_FLAG)
+                sensor.addVal(sensor.datatype(
                     val), dictionary[CACHE_TIME_FLAG])
-                dictionary[self.sensors[i].flag] = self.sensors[i].getLog()
+                dictionary[sensor.flag] = sensor.getLog()
             self.newData.append(dictionary)
 
 # Glovebox
@@ -355,13 +356,11 @@ class Glovebox:
         for i in range(0, len(self.arduinos)):
             self.arduinos[i].setGlovebox(self)
 
-    def makeLogLine(self, data: Dict[str, Any], sensor: Union[Sensor, type[Sensor]]):
-        """Returns the string for a new line of the log file given the passed data"""
-        line = getTimeStr(data[CACHE_TIME_FLAG])
-        if (sensor.flag in data):
-            line += (" " + data[sensor.flag])
-        line.rstrip()
-        line += "\n"
+    def makeLogLine(self, data: Dict[str, Union[datetime.datetime, Any]], sensor: Union[Sensor, type[Sensor]]):
+        """Returns the string for a new line of the log file given the passed data. Takes UTC time."""
+        unixTimeStr = str(round(data[CACHE_TIME_FLAG].timestamp(), LOG_TIME_PRECISION))
+        localTimeStr += getTimeStr(data[CACHE_TIME_FLAG].astimezone())
+        line = f"{unixTimeStr} {localTimeStr} : {data[sensor.flag]}\n"
         return line
 
     def writeNewLogLine(self, logFile: TextIO, data: Dict[str, Any], sensor: Union[Sensor, type[Sensor]]):
@@ -369,14 +368,14 @@ class Glovebox:
         logFile.write(self.makeLogLine(data, sensor))
 
     def writeError(self, dateTime: datetime.datetime, sensorsAffected: List[Sensor], message: str):
-        """Writes an error to the error log file"""
+        """Writes an error to the error log file. Takes UTC time."""
         makeDirIfNotExist(self.getErrorFolderPath())
-        with open(self.getErrorLogPathWithDateTime(dateTime), "a") as file:
-            errorStr = f"{getTimeStr(dateTime)} [ "
-            for sensor in sensorsAffected:
-                errorStr += sensor.__class__.__name__ + " "
-            errorStr += f"] {message}\n"
-            file.write(errorStr)
+        unixTimeStr = str(round(dateTime.timestamp(), LOG_TIME_PRECISION))
+        localTimeStr += getTimeStr(dateTime.astimezone())
+        sensorsStr = f"[{" ".join([sensor.__class__.__name__ for sensor in sensorsAffected])}]"
+
+        with open(self.getErrorLogPathWithDateTime(dateTime.astimezone()), "a") as file:
+            file.write(f"{unixTimeStr} {localTimeStr} {sensorsStr} {message}")
 
     def getSensorFolderPath(self, sensorType: Union[Sensor, type[Sensor]]) -> str:
         """Returns the folder for the log files of the specified glovebox and sensor"""
@@ -388,11 +387,11 @@ class Glovebox:
 
     def getLogFilePathWithDateTime(self, dateTime: datetime.datetime, sensor: Union[Sensor, type[Sensor]]):
         """Returns the log file for this glovebox and the given datetime"""
-        return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}/{LOG_FILE_PREFIX}{str(dateTime)[0:10]}.txt"
+        return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}/{LOG_FILE_PREFIX}{str(dateTime.astimezone())[0:10]}.txt"
 
     def getErrorLogPathWithDateTime(self, dateTime: datetime.datetime):
         """Returns the error file for this glovebox and the given datetime"""
-        return f"{PATH_DIR}/{self.name}/{ERROR_LOG_FOLDER}/{ERROR_LOG_PREFIX}{str(dateTime)[0:10]}.txt"
+        return f"{PATH_DIR}/{self.name}/{ERROR_LOG_FOLDER}/{ERROR_LOG_PREFIX}{str(dateTime.astimezone())[0:10]}.txt"
 
     def update(self):
         """Gets new sensor values, logs them, and sends display values"""
@@ -461,16 +460,16 @@ def isErrorFile(fileName: str) -> bool:
     return True
 
 def getDateTimeStr(time: datetime.datetime) -> str:
-    """Returns a string representing the given datetime."""
-    return str(time)[0:11 + DATETIME_STR_LENGTH]
+    """Returns a string representing the given datetime in the local timezone."""
+    return str(time.astimezone())[0:11 + DATETIME_STR_LENGTH]
 
 def getTimeStr(time: datetime.datetime) -> str:
-    """Returns a string representing the time part of the given datetime."""
-    return str(time)[11:11 + DATETIME_STR_LENGTH]
+    """Returns a string representing the time part of the given datetime in the local timezone."""
+    return str(time.astimezone())[11:11 + DATETIME_STR_LENGTH]
 
-def getTimeFromLogLine(line: str) -> datetime.time:
-    """Returns the time of day from the given line of a log or error file"""
-    return strToTime(line[0:DATETIME_STR_LENGTH])
+def getDateTimeFromLogLine(line: str) -> datetime.datetime:
+    """Returns the UTC datetime generated from the unix timestamp of the given log or error file line."""
+    return datetime.datetime.fromtimestamp(float(readUntil(line, " ")), datetime.timezone.utc)
 
 def getDateFromLogFileName(fileName: str) -> datetime.date:
     """Returns the date from the given log file name"""

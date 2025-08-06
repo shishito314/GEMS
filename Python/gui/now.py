@@ -181,8 +181,8 @@ class Now(GuiTab):
                 readoutValuesStr += "\n"
             readoutLabelsStr += sensor.__class__.__name__
             readoutTimeStampsStr += (gems.getDateTimeStr(currentData[sensor.flag][data.DATA_TIME_KEY])
-                                     if not currentData[sensor.flag][data.DATA_TIME_KEY] == None else "_____")
-            readoutValuesStr += (gems.getDateTimeStr(currentData[sensor.flag][data.DATA_MEASUREMENT_KEY])
+                                     if currentData[sensor.flag][data.DATA_TIME_KEY] else "_____")
+            readoutValuesStr += (str(currentData[sensor.flag][data.DATA_MEASUREMENT_KEY])
                                  if not currentData[sensor.flag][data.DATA_MEASUREMENT_KEY] == None else "_____")
         self.nowReadoutLabels.config(text=readoutLabelsStr)
         self.nowReadoutValues.config(text=readoutValuesStr)

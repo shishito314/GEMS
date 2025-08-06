@@ -29,12 +29,11 @@ def printCurrent(_):
             print(
                 gems.getDatetimeStr(
                     currentData[sensor.flag][data.DATA_TIME_KEY])
-                if not currentData[sensor.flag][data.DATA_TIME_KEY] == None
+                if currentData[sensor.flag][data.DATA_TIME_KEY]
                 else "_____", end="\t"
             )
             print(
-                gems.getDatetimeStr(
-                    currentData[sensor.flag][data.DATA_MEASUREMENT_KEY])
+                str(currentData[sensor.flag][data.DATA_MEASUREMENT_KEY])
                 if not currentData[sensor.flag][data.DATA_MEASUREMENT_KEY] == None
                 else "_____"
             )

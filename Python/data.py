@@ -21,7 +21,7 @@ to the sensorType's datatype (e.g. "HIGH" and "LOW"). If true, they will be put 
 """
 import datetime
 import os
-from typing import Union
+from typing import Union, Any
 
 import matplotlib.pyplot as plt
 from gems import *
@@ -33,6 +33,19 @@ DATA_MEASUREMENT_KEY = "Data"
 DATA_ERROR_KEY = "Error"
 
 # ---------- Data Utility Functions ----------
+def parseLine(line, sensorType, keepErrors) -> tuple[datetime.datetime, Any]:
+    """Gets the time and measurement from a single line of a log file"""
+    dateTime = getDateTimeFromLogLine(line)
+    rawStr = readFrom(line, " : ")
+    try:
+        measurement = sensorType.datatype(rawStr)
+    except:
+        if not keepErrors:
+            raise ValueError(f"Could not convert \"{rawStr}\" to type {sensorType.datatype}")
+        measurement = rawStr
+
+    return dateTime, measurement
+
 def getRecentData(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], numEntries: int, keepErrors=False) -> Dict[str, List]:
     """Gets data from the last [numEntries] entries"""
     data = {DATA_TIME_KEY: [], DATA_MEASUREMENT_KEY: []}
@@ -45,21 +58,12 @@ def getRecentData(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], n
     )
 
     for logFileName in logFiles:
-        logFileDate = getDateFromLogFileName(logFileName)
+        # logFileDate = getDateFromLogFileName(logFileName)
         with open(os.path.join(sensorFolder, logFileName)) as log:
             lines = reversed(log.readlines())
         for line in lines:
             try:
-                dateTime = datetime.datetime.combine(
-                    logFileDate, getTimeFromLogLine(line)
-                )
-                rawStr = removeSpaces(readFrom(line, " "))
-                try:
-                    measurement = sensorType.datatype(rawStr)
-                except:
-                    if not keepErrors:
-                        continue
-                    measurement = rawStr
+                dateTime, measurement = parseLine(line, sensorType, keepErrors)
 
                 data[DATA_TIME_KEY].append(dateTime)
                 data[DATA_MEASUREMENT_KEY].append(measurement)
@@ -81,6 +85,8 @@ def getRecentDataAllSensors(glovebox: Glovebox, numEntries: int, keepErrors=Fals
 
 def getDataByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime, keepErrors=False) -> Dict[str, List]:
     """Gets data from the given start time to the endTime. startTime is inclusive, endTime is exclusive."""
+    startTime = startTime.astimezone(datetime.timezone.utc)
+    endTime = endTime.astimezone(datetime.timezone.utc)
     if endTime < startTime:
         raise ValueError("getDataByTime: endTime is before startTime")
 
@@ -98,25 +104,16 @@ def getDataByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], s
     )
 
     for logFileName in logFiles:
-        logFileDate = getDateFromLogFileName(logFileName)
+        # logFileDate = getDateFromLogFileName(logFileName)
         with open(os.path.join(sensorFolder, logFileName)) as log:
             for line in log:
                 try:
-                    dateTime = datetime.datetime.combine(
-                        logFileDate, getTimeFromLogLine(line)
-                    )
+                    dateTime, measurement = parseLine(line, sensorType, keepErrors)
+
                     if dateTime < startTime:
                         continue
                     if dateTime >= endTime:
                         return data
-
-                    rawStr = removeSpaces(readFrom(line, " "))
-                    try:
-                        measurement = sensorType.datatype(rawStr)
-                    except:
-                        if not keepErrors:
-                            continue
-                        measurement = rawStr
 
                     data[DATA_TIME_KEY].append(dateTime)
                     data[DATA_MEASUREMENT_KEY].append(measurement)
@@ -147,21 +144,12 @@ def getLastMeasurement(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor
     )
 
     for logFileName in logFiles:
-        logFileDate = getDateFromLogFileName(logFileName)
+        # logFileDate = getDateFromLogFileName(logFileName)
         with open(os.path.join(sensorFolder, logFileName)) as log:
             lines = reversed(log.readlines())
         for line in lines:
             try:
-                dateTime = datetime.datetime.combine(
-                    logFileDate, getTimeFromLogLine(line)
-                )
-                rawStr = removeSpaces(readFrom(line, " "))
-                try:
-                    measurement = sensorType.datatype(rawStr)
-                except:
-                    if not keepErrors:
-                        continue
-                    measurement = rawStr
+                dateTime, measurement = parseLine(line, sensorType, keepErrors)
 
                 data[DATA_TIME_KEY] = dateTime
                 data[DATA_MEASUREMENT_KEY] = measurement
@@ -180,56 +168,34 @@ def getLastMeasurementAllSensors(glovebox: Glovebox, keepErrors=False) -> Dict[s
 
 def getMeasurementNearTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], dateTime: datetime.datetime, keepErrors=False) -> Dict[str, Any]:
     """Gets the measurement taken closest to the given time for the given glovebox and sensor."""
-    def getDataFromLine(line):
-        try:
-            time = getTimeFromLogLine(line)
-            rawStr = removeSpaces(readFrom(line, " "))
-            try:
-                measurement = sensorType.datatype(rawStr)
-            except:
-                if not keepErrors:
-                    return None, None
-                measurement = rawStr
-
-            return time, measurement
-        except:
-            return None, None
+    dateTime = dateTime.astimezone(datetime.timezone.utc)
     
-    def findFirstEntry(lines) -> tuple[datetime.time, Any, int]:
+    def searchForEntry(lines, reverse: bool) -> tuple[datetime.time, Any, int]:
         entryTime = None
         entryMeasurement = None
-        index = 0
-        while not (entryTime and entryMeasurement != None) and index < len(lines):
-            entryTime, entryMeasurement = getDataFromLine(lines[index])
-            index += 1
-        return entryTime, entryMeasurement
-
-    def findLastEntry(lines) -> tuple[datetime.time, int]:
-        entryTime = None
-        entryMeasurement = None
-        index = len(lines) - 1
-        while not (entryTime and entryMeasurement != None) and index >= 0:
-            entryTime, entryMeasurement = getDataFromLine(lines[index])
-            index -= 1
+        if reverse:
+            lines = reversed(lines)
+        for line in lines:
+            try:
+                entryTime, entryMeasurement = parseLine(line, sensorType, keepErrors)
+                break
+            except:
+                pass
         return entryTime, entryMeasurement
     
     def searchNeighborFile(dateTime, sensorFolder, logFiles, fileIndex, isBefore):
-        newFileLastTime = None
-        newFileLastMeasurement = None
-        newFileDate = None
-        newFileLastDatetime = None
+        newFileMeasurement = None
+        newFileDatetime = None
         offset = None
-        while not (newFileLastTime and newFileLastMeasurement != None) and 0 <= fileIndex < len(logFiles):
+        while not (newFileDatetime and newFileMeasurement != None) and 0 <= fileIndex < len(logFiles):
             with open(os.path.join(sensorFolder, logFiles[fileIndex])) as log:
                 lines = log.readlines()
-            newFileLastTime, newFileLastMeasurement = findLastEntry(lines) if isBefore else findFirstEntry(lines)
+            newFileDatetime, newFileMeasurement = searchForEntry(lines, True) if isBefore else searchForEntry(lines, False)
             fileIndex += -1 if isBefore else 1
         fileIndex += 1 if isBefore else -1
-        if 0 <= fileIndex < len(logFiles) and newFileLastTime:
-            newFileDate = getDateFromLogFileName(logFiles[fileIndex])
-            newFileLastDatetime = datetime.datetime.combine(newFileDate, newFileLastTime)
-            offset = dateTime - newFileLastDatetime
-        return offset, newFileLastDatetime, newFileLastMeasurement
+        if 0 <= fileIndex < len(logFiles) and newFileDatetime:
+            offset = dateTime - newFileDatetime
+        return offset, newFileDatetime, newFileMeasurement
 
     def getNearestEntryFromNeighborFiles(dateTime, sensorFolder, logFiles, prevIndex, nextIndex):
         data = {DATA_TIME_KEY: None, DATA_MEASUREMENT_KEY: None}
@@ -263,76 +229,72 @@ def getMeasurementNearTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Se
     logFileForTime = os.path.basename(glovebox.getLogFilePathWithDateTime(dateTime, sensorType))
     if logFileForTime in logFiles:
         logFileName = logFileForTime
-        logFileDate = getDateFromLogFileName(logFileName)
         with open(os.path.join(sensorFolder, logFileName)) as log:
             lines = log.readlines()
 
-        firstTime, firstMeasurement = findFirstEntry(lines)
-        lastTime, lastMeasurement = findLastEntry(lines)
+        firstDateTime, firstMeasurement = searchForEntry(lines, False)
+        lastDateTime, lastMeasurement = searchForEntry(lines, True)
 
-        if not (firstTime and firstMeasurement != None):
+        if not (firstDateTime and firstMeasurement != None):
             prevIndex = logFiles.index(logFileName) - 1
             nextIndex = logFiles.index(logFileName) + 1
             return getNearestEntryFromNeighborFiles(dateTime, sensorFolder, logFiles, prevIndex, nextIndex)
 
-        if firstTime > dateTime.time():
+        if firstDateTime > dateTime:
             prevIndex = logFiles.index(logFileName) - 1
             if prevIndex >= 0:
-                prevFileDate = getDateFromLogFileName(logFiles[prevIndex])
                 with open(os.path.join(sensorFolder, logFiles[prevIndex])) as log:
                     prevFileLines = log.readlines()
-                timeOffset = firstTime - dateTime.time()
-                prevFileLastTime, prevFileLastMeasurement = findLastEntry(prevFileLines)
-                if prevFileLastTime and prevFileLastMeasurement != None:
-                    prevFileLastDatetime = datetime.datetime.combine(prevFileDate, prevFileLastTime)
+                timeOffset = firstDateTime - dateTime
+                prevFileLastDatetime, prevFileLastMeasurement = searchForEntry(prevFileLines, True)
+                if prevFileLastDatetime and prevFileLastMeasurement != None:
                     if dateTime - prevFileLastDatetime < timeOffset:
                         data[DATA_TIME_KEY] = prevFileLastDatetime
                         data[DATA_MEASUREMENT_KEY] = prevFileLastMeasurement
                         return data
-            data[DATA_TIME_KEY] = datetime.datetime.combine(logFileDate, firstTime)
+            data[DATA_TIME_KEY] = firstDateTime #datetime.datetime.combine(logFileDate, firstTime)
             data[DATA_MEASUREMENT_KEY] = firstMeasurement
             return data
 
-        elif lastTime < dateTime.time():
+        elif lastDateTime < dateTime:
             nextIndex = logFiles.index(logFileName) + 1
             if nextIndex < len(logFiles):
-                nextFileDate = getDateFromLogFileName(logFiles[nextIndex])
                 with open(os.path.join(sensorFolder, logFiles[nextIndex])) as log:
                     nextFileLines = log.readlines()
-                timeOffset = dateTime.time() - lastTime
-                nextFileFirstTime, nextFileFirstMeasurement = findFirstEntry(nextFileLines)
-                if nextFileFirstTime and nextFileFirstMeasurement != None:
-                    nextFileFirstDatetime = datetime.datetime.combine(nextFileDate, nextFileFirstTime)
-                    if nextFileFirstDatetime - dateTime <= timeOffset:
-                        data[DATA_TIME_KEY] = nextFileFirstDatetime
+                timeOffset = dateTime - lastDateTime
+                nextFileFirstDateTime, nextFileFirstMeasurement = searchForEntry(nextFileLines, False)
+                if nextFileFirstDateTime and nextFileFirstMeasurement != None:
+                    if nextFileFirstDateTime - dateTime <= timeOffset:
+                        data[DATA_TIME_KEY] = nextFileFirstDateTime
                         data[DATA_MEASUREMENT_KEY] = nextFileFirstMeasurement
                         return data
-            data[DATA_TIME_KEY] = datetime.datetime.combine(logFileDate, lastTime)
+            data[DATA_TIME_KEY] = lastDateTime #datetime.datetime.combine(logFileDate, lastTime)
             data[DATA_MEASUREMENT_KEY] = lastMeasurement
             return data
             
         else:
             # not doing binary search because of malformed line risk
             minimumOffset = datetime.timedelta(days=1, hours=1) # 25 hours
-            closestTime = None
+            closestDateTime = None
             closestTimeMeasurement = None
             for line in lines:
-                timeOfDay, measurement = getDataFromLine(line)
-                time = datetime.datetime.combine(logFileDate, timeOfDay)
-                if time and measurement != None:
-                    offset = abs(time - dateTime)
-                    if offset > minimumOffset: # passed the closest element
-                        break
-                    minimumOffset = offset
-                    closestTime = time
-                    closestTimeMeasurement = measurement
+                try:
+                    lineTime, measurement = parseLine(line, sensorType, keepErrors)
+                except:
+                    continue
+                offset = abs(lineTime - dateTime)
+                if offset > minimumOffset: # passed the closest element
+                    break
+                minimumOffset = offset
+                closestDateTime = lineTime
+                closestTimeMeasurement = measurement
             
-            if not closestTime:
+            if not closestDateTime:
                 prevIndex = logFiles.index(logFileName) - 1
                 nextIndex = logFiles.index(logFileName) + 1
                 return getNearestEntryFromNeighborFiles(dateTime, sensorFolder, logFiles, prevIndex, nextIndex)
 
-            data[DATA_TIME_KEY] = closestTime
+            data[DATA_TIME_KEY] = closestDateTime
             data[DATA_MEASUREMENT_KEY] = closestTimeMeasurement
             return data
         
@@ -353,6 +315,8 @@ def getMeasurementNearTimeAllSensors(glovebox: Glovebox, dateTime: datetime.date
 
 def getErrorsByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]], startTime: datetime.datetime, endTime: datetime.datetime) -> Dict[str, List[Union[datetime.datetime, str]]]:
     """Gets errors from the given start time to the endTime. startTime is inclusive, endTime is exclusive"""
+    startTime = startTime.astimezone(datetime.timezone.utc)
+    endTime = endTime.astimezone(datetime.timezone.utc)
     if endTime < startTime:
         raise ValueError("getDataByTime: endTime is before startTime")
 
@@ -370,13 +334,11 @@ def getErrorsByTime(glovebox: Glovebox, sensorType: Union[Sensor, type[Sensor]],
     )
 
     for errorFileName in errorFiles:
-        errorFileDate = getDateFromErrorFileName(errorFileName)
+        # errorFileDate = getDateFromErrorFileName(errorFileName)
         with open(os.path.join(errorFolder, errorFileName)) as log:
             for line in log:
                 try:
-                    dateTime = datetime.datetime.combine(
-                        errorFileDate, getTimeFromLogLine(line)
-                    )
+                    dateTime = getDateTimeFromLogLine(line)
                     if dateTime < startTime:
                         continue
                     if dateTime >= endTime:
@@ -420,13 +382,11 @@ def getErrorsByTimeAllSensors(glovebox: Glovebox, startTime: datetime.datetime, 
     )
 
     for errorFileName in errorFiles:
-        errorFileDate = getDateFromErrorFileName(errorFileName)
+        # errorFileDate = getDateFromErrorFileName(errorFileName)
         with open(os.path.join(errorFolder, errorFileName)) as log:
             for line in log:
                 try:
-                    dateTime = datetime.datetime.combine(
-                        errorFileDate, getTimeFromLogLine(line)
-                    )
+                    dateTime = getDateTimeFromLogLine(line)
                     if dateTime < startTime:
                         continue
                     if dateTime >= endTime:
@@ -483,13 +443,14 @@ def verifyFile(filePath, sensorType: Union[Sensor, type[Sensor]], keepErrors=Fal
     """Verify that the given file can be parsed for data."""
     if not os.path.exists(filePath):
         raise ValueError("Invalid file path")
-    logFileDate = getDateFromLogFileName(os.path.basename(filePath))
+    # logFileDate = getDateFromLogFileName(os.path.basename(filePath))
+    lastDateTime = datetime.datetime.min
     with open(filePath) as log:
         for line in log:
             try:
-                _ = datetime.datetime.combine(
-                    logFileDate, getTimeFromLogLine(line)
-                )
+                dateTime = getDateTimeFromLogLine(line)
+                if dateTime < lastDateTime:
+                    return False
 
                 rawStr = removeSpaces(readFrom(line, " "))
                 try:
