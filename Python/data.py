@@ -5,6 +5,17 @@ Data utilities for analysis, plotting, etc. with glovebox data.
 Expects log files to be at ./glovebox/sensor/
 with glovebox being the glovebox name and sensor being the sensor type.
 
+Times:
+----------
+All the timestamps returned by the data parsing functions will be in UTC time.
+They can be converted to the local time using the astimezone() function from the datetime module,
+for example as follows:
+
+times = [t.astimezone() for t in data[DATA_TIME_KEY]]
+
+The data functions that take datetime arguments can be given any timezone, as the arguments will
+be converted to UTC time internally.
+
 Data Format:
 ----------
 Functions that get a specific sensor's data will return a dictionary with a list of timestamps
@@ -408,7 +419,7 @@ def getErrorsByTimeAllSensors(glovebox: Glovebox, startTime: datetime.datetime, 
 # -------------------- Plotting Data --------------------
 def plotData(data: Dict[str, List], plotFormat=None, title=None, xlabel=DATA_TIME_KEY, ylabel=None):
     """Plots given data using matplotlib."""
-    times = data[DATA_TIME_KEY]
+    times = [t.astimezone() for t in data[DATA_TIME_KEY]]
     measurements = data[DATA_MEASUREMENT_KEY]
     plt.title(title if title else flag)
     plt.xlabel(xlabel)
@@ -420,7 +431,7 @@ def plotData(data: Dict[str, List], plotFormat=None, title=None, xlabel=DATA_TIM
 
 def subPlotData(subPlot: Axes, data: Dict[str, List], plotFormat=None, title=None):
     """Plots given data on a given sub-plot using matplotlib."""
-    times = data[DATA_TIME_KEY]
+    times = [t.astimezone() for t in data[DATA_TIME_KEY]]
     measurements = data[DATA_MEASUREMENT_KEY]
     subPlot.set_title(title if title else "untitled")
     if plotFormat:
@@ -430,7 +441,7 @@ def subPlotData(subPlot: Axes, data: Dict[str, List], plotFormat=None, title=Non
 
 def subPlotErrors(subPlot: Axes, errors, **plotFormat):
     """Plots given errors on a given sub-plot using matplotlib."""
-    times = errors[DATA_TIME_KEY]
+    times = [t.astimezone() for t in errors[DATA_TIME_KEY]]
     if plotFormat:
         for time in times:
             subPlot.axvline(time, **plotFormat)

@@ -22,7 +22,7 @@ class Now(GuiTab):
         self.timeScaleVal = 30
 
         # --- Plotting Elements ---
-        self.fig = Figure(figsize=(7, 6), dpi=100)
+        self.fig = Figure(figsize=(7, 6), dpi=100, tight_layout=True)
         self.canvas = FigureCanvasTkAgg(self.fig, master=window)
         self.toolbar = NavigationToolbar2Tk(
             self.canvas, window=window, pack_toolbar=False)
@@ -116,6 +116,7 @@ class Now(GuiTab):
 
         self.fig.clear()
         nowPlot = self.fig.add_subplot()
+        nowPlot.tick_params(axis='x', labelrotation=45)
         data.subPlotData(nowPlot, plotData,
                          title=self.nowPlotSensorType.__name__)
         data.subPlotErrors(nowPlot, plotErrors, color="red")
