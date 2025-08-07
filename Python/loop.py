@@ -28,8 +28,7 @@ while True:
         try:
             glovebox.update()
         except Exception as e:
-            print(
-                f"{datetime.datetime.now()} There was an error updating {glovebox.name}")
+            print(f"{datetime.datetime.now()} There was an error updating {glovebox.name}")
             traceback.print_exc()
 
     waitMarker += gems.CYCLE_TIMING

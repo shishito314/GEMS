@@ -14,6 +14,7 @@ from tkinter import font
 
 import gems
 import gui.config
+import gui.graph
 import gui.log
 import gui.now
 import gui.tab
@@ -47,6 +48,8 @@ for glovebox in gems.gloveboxes:
 # The list of widgets is just things to pack_forget, so we only need the containers for the glovebox and sensor buttons
 gui.now.Now(window, guiTabSystem, gloveboxTabSystem,
             sensorTabSystem, defaultFont)
+gui.graph.Graph(window, guiTabSystem, gloveboxTabSystem,
+            sensorTabSystem)
 gui.log.Log(window, guiTabSystem, gloveboxTabSystem)
 gui.config.Config(window, guiTabSystem)
 

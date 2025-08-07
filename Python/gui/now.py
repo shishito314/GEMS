@@ -59,7 +59,7 @@ class Now(GuiTab):
         self.nowUpdateButton = ttk.Button(
             master=self.readoutContainer, text="Update", command=lambda: guiTabSystem.currentTab.display())
 
-        # Widget Lists
+        # --- Widget Lists ---
         self.plotControlWidgets = [
             self.timeControlContainer, self.timeScale,
             self.timeScaleDisplay, self.timeScaleButton, self.timeScaleLabel
@@ -92,6 +92,7 @@ class Now(GuiTab):
         return super().unDisplay()
 
     def displayFunc(self):
+        self.gloveboxTabSystem.display()
         # Changing the sensor buttons for the plot if needed
         if self.prevGlovebox != self.gloveboxTabSystem.currentTab.glovebox:
             self._rebuildSensorTabs()
