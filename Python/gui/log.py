@@ -8,7 +8,6 @@ import gems
 from gui.tab import *
 from utilities import *
 
-
 class Log(GuiTab):
     def __init__(self, window, guiTabSystem, gloveboxTabSystem):
         self.gloveboxTabSystem = gloveboxTabSystem
@@ -74,14 +73,17 @@ class Log(GuiTab):
         self.dirs.clear()
         self.files.clear()
 
-        walkResult = os.walk(f"{gems.PATH_DIR}/{self.gloveboxTabSystem.currentTab.glovebox.name}")
+        walkRoot = os.path.join(gems.PATH_DIR, self.gloveboxTabSystem.currentTab.glovebox.name)
+        walkResult = os.walk(walkRoot)
 
         for dirPath, _, fileNames in walkResult:
-            dirPath = os.path.basename(dirPath)
+            dirKey = os.path.basename(dirPath)
+            
             fileNames = [f for f in fileNames if not f.startswith('.')]
+            
             if fileNames:
-                self.dirs.append(dirPath)
-                self.files[dirPath] = sorted(fileNames, reverse=True)
+                self.dirs.append(dirKey)
+                self.files[dirKey] = sorted(fileNames, reverse=True)
 
         self.dirs.sort()
 
@@ -89,7 +91,8 @@ class Log(GuiTab):
             return
 
         firstDir = self.dirs[0]
-        firstFile = self.files[firstDir][0]
+        if self.files[firstDir]:
+            firstFile = self.files[firstDir][0]
 
         self.folderDropdown.set_menu(firstDir, *self.dirs)
         self.fileDropdown.set_menu(firstFile, *self.files[firstDir])

@@ -48,18 +48,18 @@ class Graph(GuiTab):
         self.vcmd_minute = window.register(lambda val: self._validate_num_range(val, 0, 59))
 
         # Start time inputs
-        self.startYear = tk.Entry(self.timeControlContainer, width=5, validate="key", validatecommand=(self.vcmd_year, "%P"))
-        self.startMonth = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_month, "%P"))
-        self.startDay = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_day_start, "%P"))
-        self.startHour = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_hour, "%P"))
-        self.startMinute = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_minute, "%P"))
+        self.startYear = ttk.Entry(self.timeControlContainer, width=5, validate="key", validatecommand=(self.vcmd_year, "%P"))
+        self.startMonth = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_month, "%P"))
+        self.startDay = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_day_start, "%P"))
+        self.startHour = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_hour, "%P"))
+        self.startMinute = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_minute, "%P"))
 
         # End time inputs
-        self.endYear = tk.Entry(self.timeControlContainer, width=5, validate="key", validatecommand=(self.vcmd_year, "%P"))
-        self.endMonth = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_month, "%P"))
-        self.endDay = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_day_end, "%P"))
-        self.endHour = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_hour, "%P"))
-        self.endMinute = tk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_minute, "%P"))
+        self.endYear = ttk.Entry(self.timeControlContainer, width=5, validate="key", validatecommand=(self.vcmd_year, "%P"))
+        self.endMonth = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_month, "%P"))
+        self.endDay = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_day_end, "%P"))
+        self.endHour = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_hour, "%P"))
+        self.endMinute = ttk.Entry(self.timeControlContainer, width=3, validate="key", validatecommand=(self.vcmd_minute, "%P"))
 
         self.timeWarningLabel = ttk.Label(window, text="", foreground="red")
 
@@ -98,24 +98,14 @@ class Graph(GuiTab):
             guiTabSystem
         )
 
-    def setTimeScale(self, val):
-        val = round(float(val) * (MAX_TIME - 1) + 1)
-        self.timeScaleVal = val
-        self.timeScaleDisplay.config(text=getTimeDurationStr(val))
-
-    def unDisplay(self):
-        for tab in self.sensorTabSystem.tabs:
-            tab.button.destroy()
-        return super().unDisplay()
-
     def displayFunc(self):
         self.gloveboxTabSystem.display()
         # Changing the sensor buttons for the plot if needed
         if self.prevGlovebox != self.gloveboxTabSystem.currentTab.glovebox:
+            self.prevGlovebox = self.gloveboxTabSystem.currentTab.glovebox
             self._rebuildSensorTabs()
-            # getting a sensor type if needed
-        if not self.nowPlotSensorType:
-            self.nowPlotSensorType = self.sensorTabSystem.currentTab.sensorType
+
+        self.nowPlotSensorType = self.sensorTabSystem.currentTab.sensorType
 
         self._drawPlot()
 
@@ -157,6 +147,7 @@ class Graph(GuiTab):
             sensorTab = SensorTab(
                 type(sensor), self.sensorTabSystem, self.tabSystem, self)
             self.widgets.append(sensorTab.button)
+        self.sensorTabSystem.setCurrentTab(self.sensorTabSystem.tabs[0])
 
     def _packWidgets(self):
         """Handles packing of all dynamic widgets."""

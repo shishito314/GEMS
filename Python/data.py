@@ -32,7 +32,7 @@ to the sensorType's datatype (e.g. "HIGH" and "LOW"). If true, they will be put 
 """
 import datetime
 import os
-from typing import Any, Type, Union
+from typing import Any, Type, Union, Tuple
 
 import matplotlib.pyplot as plt
 from gems import *
@@ -44,7 +44,7 @@ DATA_MEASUREMENT_KEY = "Data"
 DATA_ERROR_KEY = "Error"
 
 # ---------- Data Utility Functions ----------
-def parseLine(line, sensorType, keepErrors) -> tuple[datetime.datetime, Any]:
+def parseLine(line, sensorType, keepErrors) -> Tuple[datetime.datetime, Any]:
     """Gets the time and measurement from a single line of a log file"""
     dateTime = getDateTimeFromLogLine(line)
     rawStr = readFrom(line, " : ")
@@ -181,7 +181,7 @@ def getMeasurementNearTime(glovebox: Glovebox, sensorType: Union[Sensor, Type[Se
     """Gets the measurement taken closest to the given time for the given glovebox and sensor."""
     dateTime = dateTime.astimezone(datetime.timezone.utc)
     
-    def searchForEntry(lines, reverse: bool) -> tuple[datetime.time, Any, int]:
+    def searchForEntry(lines, reverse: bool) -> Tuple[datetime.time, Any, int]:
         entryTime = None
         entryMeasurement = None
         if reverse:

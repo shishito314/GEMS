@@ -4,15 +4,16 @@ import tkinter.ttk as ttk
 import data
 import gems
 from gui.tab import *
+from gui.settings import *
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 from utilities import *
 
-MAX_TIME = 14400
+MAX_TIME = 10080
 
 class Now(GuiTab):
-    def __init__(self, window, guiTabSystem, gloveboxTabSystem, sensorTabSystem, defaultFont):
+    def __init__(self, window, guiTabSystem, gloveboxTabSystem, sensorTabSystem):
         self.gloveboxTabSystem = gloveboxTabSystem
         self.sensorTabSystem = sensorTabSystem
 
@@ -33,11 +34,11 @@ class Now(GuiTab):
         # --- Readout Elements ---
         self.readoutContainer = ttk.Frame(master=window)
         self.nowReadoutLabels = tk.Message(
-            master=self.readoutContainer, width=100, font=(defaultFont, 18))
+            master=self.readoutContainer, width=100, font=(getLargeFont(), 18))
         self.nowReadoutTimeStamps = tk.Message(
-            master=self.readoutContainer, width=300, font=(defaultFont, 18))
+            master=self.readoutContainer, width=300, font=(getLargeFont(), 18))
         self.nowReadoutValues = tk.Message(
-            master=self.readoutContainer, width=100, font=(defaultFont, 18))
+            master=self.readoutContainer, width=100, font=(getLargeFont(), 18))
         self.readoutLabel = ttk.Label(
             master=self.readoutContainer, text="Last Successful Measurements:")
 
@@ -82,23 +83,20 @@ class Now(GuiTab):
         )
 
     def setTimeScale(self, val):
+        """Set the time scale for the plot to cover"""
         val = round(float(val) * (MAX_TIME - 1) + 1)
         self.timeScaleVal = val
         self.timeScaleDisplay.config(text=getTimeDurationStr(val))
 
-    def unDisplay(self):
-        for tab in self.sensorTabSystem.tabs:
-            tab.button.destroy()
-        return super().unDisplay()
 
     def displayFunc(self):
         self.gloveboxTabSystem.display()
-        # Changing the sensor buttons for the plot if needed
+        # Change the sensor buttons for the plot if needed
         if self.prevGlovebox != self.gloveboxTabSystem.currentTab.glovebox:
+            self.prevGlovebox = self.gloveboxTabSystem.currentTab.glovebox
             self._rebuildSensorTabs()
-            # getting a sensor type if needed
-        if not self.nowPlotSensorType:
-            self.nowPlotSensorType = self.sensorTabSystem.currentTab.sensorType
+
+        self.nowPlotSensorType = self.sensorTabSystem.currentTab.sensorType
 
         self._updateReadouts()
 
@@ -107,6 +105,7 @@ class Now(GuiTab):
         self._packWidgets()
 
     def _drawPlot(self):
+        """Draws the plot, getting data and errors for the current sensor type and glovebox."""
         startTime = datetime.datetime.now() - datetime.timedelta(minutes=self.timeScaleVal)
         endTime = datetime.datetime.now()
 
@@ -142,6 +141,7 @@ class Now(GuiTab):
             sensorTab = SensorTab(
                 type(sensor), self.sensorTabSystem, self.tabSystem, self)
             self.widgets.append(sensorTab.button)
+        self.sensorTabSystem.setCurrentTab(self.sensorTabSystem.tabs[0])
 
     def _packWidgets(self):
         """Handles packing of all dynamic widgets."""
@@ -170,6 +170,7 @@ class Now(GuiTab):
         self.sensorTabSystem.container.focus_set()
 
     def _updateReadouts(self):
+        """Updates the readout values with the latest sensor measurements."""
         currentData = data.getLastMeasurementAllSensors(
             self.gloveboxTabSystem.currentTab.glovebox)
         readoutLabelsStr = ""

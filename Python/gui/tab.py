@@ -3,7 +3,6 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from typing import List
 
-
 class TabSystem:
     def __init__(self, window):
         self.container = ttk.Frame(master=window, padding=3)
@@ -21,7 +20,7 @@ class TabSystem:
         self.container.pack()
 
     def setCurrentTab(self, tab):
-        self.currentTab.button.config(style="Unselected.TButton")
+        self.currentTab.button.config(style="TButton")
         self.currentTab = tab
         self.currentTab.button.config(style="Selected.TButton")
 
@@ -30,14 +29,13 @@ class TabSystem:
         if (len(self.tabs) == 1):
             self.currentTab = tab
 
-
 class Tab:
     def __init__(self, name, tabSystem):
         self.name: str = name
         self.tabSystem: TabSystem = tabSystem
         tabSystem.addTab(self)
         self.button: ttk.Button = ttk.Button(
-            master=tabSystem.container, text=name, command=self.display, style="Unselected.TButton")
+            master=tabSystem.container, text=name, command=self.display, style="TButton")
 
     def unDisplay(self):
         pass
@@ -49,7 +47,6 @@ class Tab:
 
     def displayFunc(self):
         raise NotImplementedError("Tab displayFunc not implemented")
-
 
 # -------------------- GUI Tab System --------------------
 class GuiTab(Tab):
@@ -63,21 +60,19 @@ class GuiTab(Tab):
         for widget in self.widgets:
             widget.pack_forget()
 
-
 # -------------------- Glovebox Selecting Buttons --------------------
 gloveboxButtons = []
 class GloveboxTab(Tab):
     def __init__(self, glovebox, gloveboxTabSystem, guiTabSystem):
         self.glovebox = glovebox
         self.guiTabSystem = guiTabSystem
-        super().__init__(glovebox.name, gloveboxTabSystem)
         self.button = ttk.Button(
             master=gloveboxTabSystem.container, text=glovebox.name, command=self.display)
         gloveboxButtons.append(self.button)
+        super().__init__(glovebox.name, gloveboxTabSystem)
 
     def displayFunc(self):
         self.guiTabSystem.currentTab.display()
-
 
 # -------------------- Sensor Selecting Buttons (For Now Tab) --------------------
 class SensorTab(Tab):
@@ -85,10 +80,9 @@ class SensorTab(Tab):
         self.sensorType = sensorType
         self.guiTabSystem = guiTabSystem
         self.nowTab = nowTab
-        super().__init__(sensorType.__name__, sensorTabSystem)
         self.button = ttk.Button(
             master=sensorTabSystem.container, text=sensorType.__name__, command=self.display)
-
+        super().__init__(sensorType.__name__, sensorTabSystem)
+        
     def displayFunc(self):
-        self.nowTab.nowPlotSensorType = self.sensorType
         self.guiTabSystem.currentTab.display()

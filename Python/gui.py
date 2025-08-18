@@ -10,7 +10,6 @@ when the GUI window is closed.
 """
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter import font
 
 import gems
 import gui.config
@@ -18,11 +17,8 @@ import gui.graph
 import gui.log
 import gui.now
 import gui.tab
+from gui.settings import *
 from utilities import *
-
-# -------------------- Constants --------------------
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 625
 
 # -------------------- Window Setup --------------------
 window = tk.Tk()
@@ -32,10 +28,8 @@ window.resizable(False, False)
 
 # Styling for tab buttons
 guiStyle = ttk.Style()
-defaultFont = font.nametofont("TkDefaultFont").actual()
-guiStyle.configure("Selected.TButton", foreground="white",
-                   font=(defaultFont, defaultFont["size"], 'bold'))
-guiStyle.configure("Unselected.TButton", foreground="white")
+guiStyle.configure(".", foreground=SYSTEM_FONT_COLOR)
+guiStyle.configure("Selected.TButton", font=getBoldFont())
 
 guiTabSystem = gui.tab.TabSystem(window)
 gloveboxTabSystem = gui.tab.TabSystem(window)
@@ -45,9 +39,8 @@ for glovebox in gems.gloveboxes:
     gui.tab.GloveboxTab(glovebox, gloveboxTabSystem, guiTabSystem)
 
 # -------------------- GUI Sections Initialization --------------------
-# The list of widgets is just things to pack_forget, so we only need the containers for the glovebox and sensor buttons
 gui.now.Now(window, guiTabSystem, gloveboxTabSystem,
-            sensorTabSystem, defaultFont)
+            sensorTabSystem)
 gui.graph.Graph(window, guiTabSystem, gloveboxTabSystem,
             sensorTabSystem)
 gui.log.Log(window, guiTabSystem, gloveboxTabSystem)

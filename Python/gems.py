@@ -269,7 +269,7 @@ class Arduino:
 
     def getInternalFilePath(self) -> str:
         """Returns the path to the internal directory for this Arduino."""
-        return f"{PATH_DIR}/{INTERNAL_DIR}/arduino{str(self.arduinoIndex)}.txt"
+        return os.path.join(PATH_DIR, INTERNAL_DIR, f"arduino{str(self.arduinoIndex)}.txt")
 
     def update(self):
         """Requests and stores the new values from the arduino."""
@@ -299,7 +299,7 @@ class Arduino:
         self.millisReference = int(readFromUntil(
             timeHeader, CACHE_TIME_FLAG, END_FLAG))
 
-        makeDirIfNotExist(f"{PATH_DIR}/{INTERNAL_DIR}")
+        makeDirIfNotExist(os.path.join(PATH_DIR, INTERNAL_DIR))
         internalFileName = self.getInternalFilePath()
         if os.path.isfile(internalFileName):
             with open(internalFileName, "r") as internalFile:
@@ -375,23 +375,23 @@ class Glovebox:
         sensorsStr = f"[{' '.join([sensor.__class__.__name__ for sensor in sensorsAffected])}]"
 
         with open(self.getErrorLogPathWithDateTime(dateTime.astimezone()), "a") as file:
-            file.write(f"{unixTimeStr} {localTimeStr} {sensorsStr} {message}")
+            file.write(f"{unixTimeStr} {localTimeStr} {sensorsStr} {message}\n")
 
     def getSensorFolderPath(self, sensorType: Union[Sensor, Type[Sensor]]) -> str:
         """Returns the folder for the log files of the specified glovebox and sensor"""
-        return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensorType.flag]}"
+        return os.path.join(PATH_DIR, self.name, SENSOR_FOLDER_NAMES[sensorType.flag])
 
     def getErrorFolderPath(self) -> str:
         """Returns the folder for the error files of this glovebox"""
-        return f"{PATH_DIR}/{self.name}/{ERROR_LOG_FOLDER}"
+        return os.path.join(PATH_DIR, self.name, ERROR_LOG_FOLDER)
 
     def getLogFilePathWithDateTime(self, dateTime: datetime.datetime, sensor: Union[Sensor, Type[Sensor]]):
         """Returns the log file for this glovebox and the given datetime"""
-        return f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}/{LOG_FILE_PREFIX}{str(dateTime.astimezone())[0:10]}.txt"
+        return os.path.join(PATH_DIR, self.name, SENSOR_FOLDER_NAMES[sensor.flag], f"{LOG_FILE_PREFIX}{str(dateTime.astimezone())[0:10]}.txt")
 
     def getErrorLogPathWithDateTime(self, dateTime: datetime.datetime):
         """Returns the error file for this glovebox and the given datetime"""
-        return f"{PATH_DIR}/{self.name}/{ERROR_LOG_FOLDER}/{ERROR_LOG_PREFIX}{str(dateTime.astimezone())[0:10]}.txt"
+        return os.path.join(PATH_DIR, self.name, ERROR_LOG_FOLDER, f"{ERROR_LOG_PREFIX}{str(dateTime.astimezone())[0:10]}.txt")
 
     def update(self):
         """Gets new sensor values, logs them, and sends display values"""
@@ -406,14 +406,13 @@ class Glovebox:
             return
 
         # Log data
-        makeDirIfNotExist(f"{PATH_DIR}/{self.name}")
+        makeDirIfNotExist(os.path.join(PATH_DIR, self.name))
 
         for sensor in self.allSensors:
-            makeDirIfNotExist(
-                f"{PATH_DIR}/{self.name}/{SENSOR_FOLDER_NAMES[sensor.flag]}")
+            makeDirIfNotExist(self.getSensorFolderPath(sensor))
 
             for log in allNewData:
-                if log[sensor.flag]:
+                if sensor.flag in log:
                     logFileName = self.getLogFilePathWithDateTime(
                         log[CACHE_TIME_FLAG], sensor)
                     with open(logFileName, "a") as logFile:
