@@ -28,10 +28,8 @@ IMPORTANT: Capitalization and the colons after words are mandatory.
 class Config(GuiTab):
     def __init__(self, window, guiTabSystem):
         self.configText = tk.Text(master=window)
-        self.configSave = ttk.Button(
-            master=window, text="Save", command=self.saveConfig)
-        self.helpButton = ttk.Button(
-            master=window, text="Help", command=self.showHelp)
+        self.configSave = ttk.Button(master=window, text="Save", command=self.saveConfig)
+        self.helpButton = ttk.Button(master=window, text="Help", command=self.showHelp)
         super().__init__(
             "config", [self.configText, self.configSave, self.helpButton], guiTabSystem)
 
@@ -51,8 +49,7 @@ class Config(GuiTab):
         helpTextWidget.pack(expand=True, fill="both", padx=10, pady=10)
 
         # Optional: add a close button for user convenience
-        closeButton = ttk.Button(
-            helpWindow, text="Close", command=helpWindow.destroy)
+        closeButton = ttk.Button(helpWindow, text="Close", command=helpWindow.destroy)
         closeButton.pack(pady=(0, 10))
 
     def displayFunc(self):

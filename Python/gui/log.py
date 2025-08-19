@@ -78,9 +78,9 @@ class Log(GuiTab):
 
         for dirPath, _, fileNames in walkResult:
             dirKey = os.path.basename(dirPath)
-            
+
             fileNames = [f for f in fileNames if not f.startswith('.')]
-            
+
             if fileNames:
                 self.dirs.append(dirKey)
                 self.files[dirKey] = sorted(fileNames, reverse=True)

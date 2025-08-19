@@ -84,7 +84,7 @@ double calcWater(double val) {
   return ppm;
 }
 double calcOxy(double val) {
-  return ((((val * VOLT_REF / 1023.0 / SENSE_RESISTANCE * 1000.0) - OXY_LOWER_CURRENT_BOUNDS) / OXY_CURRENT_RANGE) * OXY_PPM_RANGE) + OXY_LOWER_PPM_BOUNDS;
+  return ((((val * VOLT_REF / 1023.0 / SENSE_RESISTANCE * 1000) - OXY_LOWER_CURRENT_BOUNDS) / OXY_CURRENT_RANGE) * OXY_PPM_RANGE) + OXY_LOWER_PPM_BOUNDS;
 }
 void takeMeasurements() {
   // Taking Measurements
@@ -154,7 +154,7 @@ void displayWhileDisconnected() {
 
   // checking for out of bounds current errors
   double oxyVal = oxySmooth.getValue();
-  double oxyCurrent = oxyVal * 5.0 / 1023.0 / SENSE_RESISTANCE * 1000.0;
+  double oxyCurrent = oxyVal * VOLT_REF / 1023.0 / SENSE_RESISTANCE * 1000.0;
   if (oxyCurrent < OXY_LOWER_CURRENT_BOUNDS) {
     printChars(oxyDisplay, OFFSCALE_LOW_DISPLAY);
   } else if (oxyCurrent > OXY_UPPER_CURRENT_BOUNDS) {
@@ -165,7 +165,7 @@ void displayWhileDisconnected() {
   }
 
   double waterVal = waterSmooth.getValue();
-  double waterCurrent = waterVal * 5.0 / 1023.0 / SENSE_RESISTANCE * 1000.0;
+  double waterCurrent = waterVal * VOLT_REF / 1023.0 / SENSE_RESISTANCE * 1000.0;
   if (waterCurrent < WATER_LOWER_CURRENT_BOUNDS) {
     printChars(waterDisplay, OFFSCALE_LOW_DISPLAY);
   } else if (waterCurrent > WATER_UPPER_CURRENT_BOUNDS) {

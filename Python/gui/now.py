@@ -10,7 +10,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
 from matplotlib.figure import Figure
 from utilities import *
 
-MAX_TIME = 10080
+MAX_TIME = 10080  # 7 Days
 
 class Now(GuiTab):
     def __init__(self, window, guiTabSystem, gloveboxTabSystem, sensorTabSystem):
@@ -87,7 +87,6 @@ class Now(GuiTab):
         val = round(float(val) * (MAX_TIME - 1) + 1)
         self.timeScaleVal = val
         self.timeScaleDisplay.config(text=getTimeDurationStr(val))
-
 
     def displayFunc(self):
         self.gloveboxTabSystem.display()

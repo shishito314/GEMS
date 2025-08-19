@@ -10,14 +10,21 @@ Once started, it will run indefinitely until the program is stopped.
 You may stop the program by closing the python console it is running in.
 """
 import datetime
+import os
 import time
 import traceback
 
 import gems
 
 # -------------------- Warning Prints --------------------
+try:
+    TERMINAL_WIDTH = os.get_terminal_size().columns
+except:
+    TERMINAL_WIDTH = 50
+print(f"\n{'-' * TERMINAL_WIDTH}")
 print("This python console is running GEMS, the Glovebox Environmental Monitoring System.")
-print("Please do not close this console unless you wish to stop the program.")
+print("Please DO NOT CLOSE THIS TERMINAL unless you wish to stop the program.")
+print(f"{'-' * TERMINAL_WIDTH}\n")
 
 # -------------------- Main Run Loop --------------------
 initTime = time.time()

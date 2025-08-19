@@ -39,10 +39,8 @@ for glovebox in gems.gloveboxes:
     gui.tab.GloveboxTab(glovebox, gloveboxTabSystem, guiTabSystem)
 
 # -------------------- GUI Sections Initialization --------------------
-gui.now.Now(window, guiTabSystem, gloveboxTabSystem,
-            sensorTabSystem)
-gui.graph.Graph(window, guiTabSystem, gloveboxTabSystem,
-            sensorTabSystem)
+gui.now.Now(window, guiTabSystem, gloveboxTabSystem, sensorTabSystem)
+gui.graph.Graph(window, guiTabSystem, gloveboxTabSystem, sensorTabSystem)
 gui.log.Log(window, guiTabSystem, gloveboxTabSystem)
 gui.config.Config(window, guiTabSystem)
 

@@ -64,7 +64,7 @@ class Graph(GuiTab):
         self.timeWarningLabel = ttk.Label(window, text="", foreground="red")
 
         for entry in [self.startYear, self.startMonth, self.startDay, self.startHour, self.startMinute,
-              self.endYear, self.endMonth, self.endDay, self.endHour, self.endMinute]:
+                      self.endYear, self.endMonth, self.endDay, self.endHour, self.endMinute]:
             entry.bind("<KeyRelease>", lambda event: self._check_time_order())
 
         # Default values
@@ -214,7 +214,7 @@ class Graph(GuiTab):
         if val == "" or (val.isdigit() and int(val) <= year):
             return True
         return False
-    
+
     def _validate_day(self, val, yearEntry, monthEntry):
         if val == "":
             return True
@@ -237,7 +237,7 @@ class Graph(GuiTab):
         if val == "" or (val.isdigit() and min <= int(val) <= max):
             return True
         return False
-    
+
     def _check_time_order(self):
         try:
             start = datetime.datetime(

@@ -34,8 +34,7 @@ class Tab:
         self.name: str = name
         self.tabSystem: TabSystem = tabSystem
         tabSystem.addTab(self)
-        self.button: ttk.Button = ttk.Button(
-            master=tabSystem.container, text=name, command=self.display, style="TButton")
+        self.button = ttk.Button(master=tabSystem.container, text=name, command=self.display, style="TButton")
 
     def unDisplay(self):
         pass
@@ -52,8 +51,7 @@ class Tab:
 class GuiTab(Tab):
     def __init__(self, name, widgets, guiTabSystem):
         super().__init__(name, guiTabSystem)
-        self.button = ttk.Button(
-            master=guiTabSystem.container, text=name, command=self.display)
+        self.button = ttk.Button(master=guiTabSystem.container, text=name, command=self.display)
         self.widgets: List[tk.Widget] = widgets
 
     def unDisplay(self):
@@ -66,8 +64,7 @@ class GloveboxTab(Tab):
     def __init__(self, glovebox, gloveboxTabSystem, guiTabSystem):
         self.glovebox = glovebox
         self.guiTabSystem = guiTabSystem
-        self.button = ttk.Button(
-            master=gloveboxTabSystem.container, text=glovebox.name, command=self.display)
+        self.button = ttk.Button(master=gloveboxTabSystem.container, text=glovebox.name, command=self.display)
         gloveboxButtons.append(self.button)
         super().__init__(glovebox.name, gloveboxTabSystem)
 
@@ -80,9 +77,8 @@ class SensorTab(Tab):
         self.sensorType = sensorType
         self.guiTabSystem = guiTabSystem
         self.nowTab = nowTab
-        self.button = ttk.Button(
-            master=sensorTabSystem.container, text=sensorType.__name__, command=self.display)
+        self.button = ttk.Button(master=sensorTabSystem.container, text=sensorType.__name__, command=self.display)
         super().__init__(sensorType.__name__, sensorTabSystem)
-        
+
     def displayFunc(self):
         self.guiTabSystem.currentTab.display()
