@@ -408,8 +408,8 @@ def getErrorsByTimeAllSensors(glovebox: Glovebox, startTime: datetime.datetime, 
                     sensorStr = readFromUntilRequireEnd(line, "[", "]").split()
                     for sensor in glovebox.allSensors:
                         if sensor.__class__.__name__ in sensorStr:
-                            errors[DATA_TIME_KEY].append(dateTime)
-                            errors[DATA_ERROR_KEY].append(errorMssg)
+                            errors[sensor.flag][DATA_TIME_KEY].append(dateTime)
+                            errors[sensor.flag][DATA_ERROR_KEY].append(errorMssg)
 
                 except:
                     continue

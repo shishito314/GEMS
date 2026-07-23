@@ -27,7 +27,7 @@ def printCurrent(_):
         for sensor in glovebox.allSensors:
             print(sensor.flag, end="\t")
             print(
-                gems.getDatetimeStr(
+                gems.getDateTimeStr(
                     currentData[sensor.flag][data.DATA_TIME_KEY])
                 if currentData[sensor.flag][data.DATA_TIME_KEY]
                 else "_____", end="\t"

@@ -1,13 +1,15 @@
+import datetime
 import tkinter as tk
 import tkinter.ttk as ttk
 
-import data
-import gems
-from gui.tab import *
-from gui.settings import *
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from matplotlib.figure import Figure
+
+import data
+import gems
+from gui.settings import *
+from gui.tab import *
 from utilities import *
 
 MAX_TIME = 10080  # 7 Days
@@ -34,11 +36,11 @@ class Now(GuiTab):
         # --- Readout Elements ---
         self.readoutContainer = ttk.Frame(master=window)
         self.nowReadoutLabels = tk.Message(
-            master=self.readoutContainer, width=100, font=(getLargeFont(), 18))
+            master=self.readoutContainer, width=100, font=getLargeFont())
         self.nowReadoutTimeStamps = tk.Message(
-            master=self.readoutContainer, width=300, font=(getLargeFont(), 18))
+            master=self.readoutContainer, width=300, font=getLargeFont())
         self.nowReadoutValues = tk.Message(
-            master=self.readoutContainer, width=100, font=(getLargeFont(), 18))
+            master=self.readoutContainer, width=100, font=getLargeFont())
         self.readoutLabel = ttk.Label(
             master=self.readoutContainer, text="Last Successful Measurements:")
 

@@ -8,7 +8,7 @@ import datetime
 import os
 import urllib.request
 from pathlib import Path
-from typing import Any, Dict, List, TextIO, Type, Union
+from typing import Any, Dict, List, Optional, TextIO, Type, Union
 
 from utilities import *
 
