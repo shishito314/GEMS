@@ -75,7 +75,7 @@ def listJoin(*args: List) -> List:
 def makeDirIfNotExist(path):
     """Creates the given directory if it doesn't exist."""
     if not os.path.isdir(path):
-        os.mkdir(path)
+        os.makedirs(path)
 
 def getTimeDurationStr(minutes: int) -> str:
     days = minutes // (60 * 24)

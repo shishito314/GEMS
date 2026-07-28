@@ -149,8 +149,7 @@ void printChars(Adafruit_7segment &display, const String &printMssg) {
   display.writeDisplay();
 }
 void displayWhileDisconnected() {
-  tempDisplay.print("DISC");
-  tempDisplay.writeDisplay();
+  sevenSegPrint(tempDisplay, "DISC");
 
   // checking for out of bounds current errors
   double oxyVal = oxySmooth.getValue();

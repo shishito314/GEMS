@@ -1,8 +1,8 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
 
-char ssid[] = [Insert Network Name Here]; // the name of your network
-char pass[] = [Insert Network Password Here];
+char ssid[] = "YourNetworkName"; // the name of your network
+char pass[] = "YourNetworkPassword";
 int status = WL_IDLE_STATUS; // the WiFi radio's status
 
 byte mac[6]; // the MAC address of your WiFi Module

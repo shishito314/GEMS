@@ -4,7 +4,6 @@
 
 - [Overview](#overview)
 - [Instructions For Use](#instructions-for-use)
-  - [Setup](#setup)
   - [Binding Arduino MAC Addresses](#binding-arduino-mac-addresses)
   - [Changing Display I2C Addresses](#changing-display-i2c-addresses)
   - [Python Configuration](#python-configuration)
@@ -12,7 +11,7 @@
   - [Changing Program Constants and Parameters](#changing-program-constants-and-parameters)
 - [How GEMS works](#how-gems-works)
   - [Hardware](#hardware)
-    - [Bill Of Materials](#bill-of-materials)
+    - [Bill Of Materials](https://docs.google.com/spreadsheets/d/1ikpGfJ6LjHaBAVGgCHs3OJ50SzMK_VNal6e07bsFQgU/edit?usp=sharing)
     - [Wifi Communications](#wifi-communications)
     - [Sensor Measurement](#sensor-measurement)
   - [Software](#software)
@@ -29,7 +28,7 @@
 
 Here's the basic idea of the GEMS system in it's current implementation:
 
-There are two arduino boards, one inside and one outside the glovebox. The one inside is connected to a temperature sensor. The one outside is connected to an oxygen sensor, a water/humidity sensor, and three displays (one to display each sensor measurement).
+There are two arduino boards, one inside and one outside the glovebox. The one inside is optional and connects to a temperature sensor. The one outside is part of a unit that connects to an oxygen sensor, a water/humidity sensor, and three displays (one to display each sensor measurement).
 
 When the loop.py program is run on a computer connected to the GEMS router network, it will periodically send HTTP requests to the arduinos, which are effectively hosting servers. When it sends the request, the arduino will respond with the current sensor measurement (in the form of an HTML webpage). When it gets the measurements, the computer will log them in a file.
 
@@ -37,41 +36,40 @@ Then, with the current measurements, the computer will decide what should be dis
 
 ## Instructions For Use
 
-### Setup
+Here are instructions for the full setup process:
 
-Here's the full setup you need for GEMS to work:
-
-- Computer
-  - Wifi adapter plugged in
-  - Connected to router network
-  - Python 3 installed
-  - Python programs downloaded in the same directory as the log files will be stored
-  - GEMS Configuration file setup correctly
-  - Loop.py running
-- Sensor PCB
-  - Displays soldered together (Adafruit guide [here](https://learn.adafruit.com/adafruit-7-segment-led-featherwings/overview))
-  - Displays soldered with correct I2C addresses (explanation [here](#changing-display-i2c-addresses))
-  - Displays plugged into header pins on PCB
-  - Sensor leads connected to screw terminals
-  - Arduino connected to header pins on PCB
-  - Barrel power jack connected to 24V Wall adapter (connected to wall power)
-- Arduinos
-  - Network information input correctly
-  - Correct sketch uploaded
-  - Thermocouple plugged in to Temperature Arduino
-  - Arduino (or PCB) plugged in and running
-- Router
-  - Arduino MAC addresses bound to IP addresses listed in the configuration file
-
-### Binding Arduino MAC Adresses
-
-1. Get the Arduino MAC address with the GetMacAddress Sketch
-2. Connect to the router network and go to the configuration page at [http://tplinkwifi.net/](http://tplinkwifi.net/)
-3. Sign in with password posted on the router
-4. Click "DHCP" on the left
-5. Click "Address Reservation"
-6. Add a new line, and input the MAC Address with the desired IP Address
-7. Switch to "Enable"
+1. Install desired sensors on glovebox
+2. Set up router in lab with the given instructions (No need for WAN/Internet). Make sure router is on and network is available.
+3. Connect computer to router network with USB Wifi adapter (using an auxiliary wifi adapter to retain internet access, since the local router isn't connected to the internet).
+4. Optionally, install [git](https://git-scm.com/install/) on the lab computer. This will allow for easier updates if changes are made to the GEMS github.
+5. If using git, clone the GEMS repository into the preferred filesystem location. On Mac and Windows, You can use the commands `cd your_folder_name` and then `git clone https://github.com/shishito314/GEMS.git`. You may need to sign in to your github.
+6. If not using git, you can download the repository manually (e.g. via zip)
+7. Install [Python](https://www.python.org/downloads/) on lab computer (the latest stable (non pre-release) version of Python 3 should work) You can verify that the install worked by running `python --version` in the command line.
+8. Acquire or construct physical GEMS unit with Arduino, PCB, displays, and box. You will need:
+   - Displays soldered together ([Adafruit guide here](https://learn.adafruit.com/adafruit-7-segment-led-featherwings/overview))
+   - Displays soldered with correct I2C addresses ([explanation here](#changing-display-i2c-addresses))
+   - Displays plugged into header pins on PCB
+   - Arduino connected to header pins on PCB
+   - Box screwed together
+9. Install [Arduino IDE](https://www.arduino.cc/en/software/), either on a personal or lab computer. It's only needed for setup to upload code to the arduinos.
+10. Within Arduino IDE, go to the board manager and install the package for Arduino megaAVR boards (like the Uno Wifi Rev2)
+11. Using the Library manager, install WiFiNINA and the Adafruit LED Backpack library, including all dependencies.
+12. Open the desired Arduino ino sketch in Arduino IDE and go to config.h. Edit NETWORK_SSID and NETWORK_PASS for the correct router. Save the file.
+13. Upload the code using a printer cable (USB-B) with data capability (some only transmit power). When you plug in the arduino, click the dropdown in the top left and select the board, then click upload (right arrow icon).
+14. Verify that With Arduino plugged in, open (or close and reopen) the serial monitor with the button in the top right to verify that it's working. You should see a couple prints and after ~10s, the arduino should connect to the router and print out the IP address it was assigned.
+15. Keeping the Arduino plugged in (so we know the current IP address), bind the Arduino MAC Address to the desired IP Address ([guide here](#binding-arduino-mac-adresses))
+16. Restart arduino (you can close and reopen the serial monitor) and verify that it gets the desired IP address after network connection.
+17. Connect the GEMS unit to the sensors via screw terminals and leads. Then using the wall mounted power adapter, plug in the PCB (not the arduino) to power. The PCB barrel jack is on the left side of the box, and the arduino's barrel jack (which can't handle this voltage) is on the top. Turn the unit on with the rocker switch (on = left down). The displays should come on after a few seconds.
+18. On the Lab computer, go to the command line and run `pip install matplotlib`. Alternatively you can use the environment.yml file and conda if you have it installed (otherwise overkill).
+19. Edit the config.txt file in the Python subfolder. ([guide here](#python-configuration))
+20. Run loop.py by double clicking in the file explorer or from the command line. If the program is successful, you should see a glovebox-named folder with sensor data pop up in the Python subfolder after a little while.
+21. After you get some data, you can check on it by running gui.py
+22. For optional temperature support, plug in a thermocouple to an Arduino and go through a similar process to the other arduino:
+    - Download the Adafruit MAX6675 Library and upload the temperature sketch to the arduino (again need to change config.h).
+    - Bind the Arduino MAC Address to the desired IP address
+    - Edit config.txt in the python subfolder to account for the temperature arduino
+    - After changing config.txt, rerun loop.py to apply changes.
+- You're all set! Thanks for using GEMS.
 
 ### Changing Display I2C Addresses
 
@@ -87,9 +85,21 @@ In the current GEMS Arduino code, the displays are set up as follows:
 - Oxygen display → 0x71 (A0 soldered)
 - Water display → 0x72 (A1 soldered)
 
+### Binding Arduino MAC Adresses
+
+1. Connect to the router network and go to the configuration page at [http://tplinkwifi.net/](http://tplinkwifi.net/). If your computer is connected to internet, you may need to try searching the router IP address directly (solution 2).
+2. Sign in with admin password posted on the router
+3. Depending on how old your router is, there are different versions of the web page. Either
+   1. Click "Advanced," "Network," and "DHCP Server"
+   2. Click "DHCP" on the left, then "Address Reservation"
+4. With the new webpage, you should be able to scroll down and see the currently connected clients. If you know the IP address of the arduino from the serial monitor output, you can use that to identify its MAC address.
+5. Alternatively, you can get the Arduino MAC address by temporarily uploading the getMacAddress sketch and reading the output from the serial monitor. You'll need to change the "ssid" and "pass" in the code to the network name and password. WARNING: depending on your library version, the printed MAC address might actually have the pairs of letters/numbers backwards (e.g. AB:CD:EF:12:34:56 is actually 56:34:12:EF:CD:AB).
+6. Add a new address reservation line on the router configuration page, and input the MAC Address with the desired IP Address. You can use `198.162.0.11_` as a recommended naming scheme, just varying the last digit.
+7. Switch to "Enable"
+
 ### Python Configuration
 
-To configure the software for certain gloveboxes, arduinos, and sensors, use the config.txt file.
+To configure the software for certain gloveboxes, arduinos, and sensors, use the config.txt file in the Python subfolder. If you downloaded or cloned the GEMS repository, an example is provided by default.
 Here's the format for a config file:
 
 ```
@@ -116,7 +126,7 @@ IMPORTANT: Capitalization and the colons after words are mandatory.
 
 ### Adding Sensors:
 
-Each sensor has a class in gems.py extended from the base Sensor class. To create your own, make a class extended from the base Sensor class and define the addVal and getLog methods for your sensor. It might look something like the following:
+This section is for adding new sensor types in software (e.g. if you wanted to add functionality for a pressure sensor). Each sensor has a class in gems.py extended from the base Sensor class. To create your own, make a class extended from the base Sensor class and define the addVal and getLog methods for your sensor. It might look something like the following:
 
 ```python
 class NewSensor(Sensor):
@@ -233,7 +243,7 @@ When the display arduino gets disconnected, it will calculate the oxygen and hum
 ## Known Issues and Limitations
 
 - The Arduino clock isn't perfectly accurate, so after a while there may be slightly more or less logs than expected
-- Arduino timestamps leave small probability of missing or repeating a log
+- Arduino timestamps leave minuscule probability of missing or repeating a log
 - Can't support multiple sensors of the same type on one glovebox (because it can't differentiate flags)
 - Logging untested with daylight savings time
 - Non-flexible file structure

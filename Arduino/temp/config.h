@@ -15,8 +15,8 @@
 
 // -------------------- Other Constants --------------------
 // ---------- May Be Changed ----------
-#define NETWORK_SSID "ChiangGroupWifi" // your network SSID (name)
-#define NETWORK_PASS "EVs4ALL!"        // your network password (using WPA)
+#define NETWORK_SSID "YourNetworkName"     // your network SSID (name)
+#define NETWORK_PASS "YourNetworkPassword" // your network password (using WPA)
 
 // Thermocouple module pins
 #define THERMO_CLK 10
