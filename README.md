@@ -61,12 +61,12 @@ Here are instructions for the full setup process:
 15. Keeping the arduino plugged in (so we know the current IP address), bind the arduino MAC Address to the desired IP Address ([guide here](#binding-arduino-mac-adresses))
 16. Restart arduino (you can close and reopen the serial monitor) and verify that it gets the desired IP address after network connection.
 17. Connect the GEMS unit to the sensors via screw terminals and leads. Then using the wall mounted power adapter, plug in the PCB (not the arduino) to power. The PCB barrel jack is on the left side of the box, and the arduino's barrel jack (which can't handle this voltage) is on the top. Turn the unit on with the rocker switch (on = left down). The displays should come on after a few seconds.
-18. On the Lab computer, go to the command line and run `pip install matplotlib`. Alternatively you can use the environment.yml file and conda if you have it installed (otherwise overkill).
+18. On the lab computer, go to the command line and run `pip install matplotlib`. Alternatively you can use the environment.yml file and conda if you have it installed (otherwise probably overkill).
 19. Edit the config.txt file in the Python subfolder. ([guide here](#python-configuration))
 20. Run loop.py by double clicking in the file explorer or from the command line. If the program is successful, you should see a glovebox-named folder with sensor data pop up in the Python subfolder after a little while.
 21. After you get some data, you can check on it by running gui.py
 22. For optional temperature support, plug in a thermocouple to an arduino and go through a similar process to the other arduino:
-    - Download the Adafruit MAX6675 Library and upload the temperature sketch to the arduino (again need to change config.h).
+    - Download the Adafruit MAX6675 Library and upload the temperature sketch to the arduino (again need to change network info in config.h).
     - Bind the arduino MAC Address to the desired IP address
     - Edit config.txt in the python subfolder to account for the temperature arduino
     - After changing config.txt, rerun loop.py to apply changes.
@@ -176,7 +176,7 @@ When changing constants in the programs, it is important to note that variables 
 
 #### Wifi Communications
 
-Required:
+Uses:
 
 - Computer with python 3
 - Router
@@ -195,10 +195,8 @@ Since it is important to know the resistance of the resistor accurately, there i
 
 There are some other pieces of hardware that address a few problems:
 
-- Capacitor
-  - There is a 10 uF capacitor running in parrallel with the resistor. It acts as a low pass filter to reduce some of the noise (15.5KHz sine wave) that had been a prior issue
-- Voltage Reference
-  - The built in arduino voltage references weren't accurate enough for the desired specs, so we use an external 4.5V reference.
+- Capacitor: There is a 10 uF capacitor running in parrallel with the resistor. It acts as a low pass filter to reduce some of the noise (15.5KHz sine wave) that had been a prior issue
+- Voltage Reference: The built in arduino voltage references weren't accurate enough for the desired specs, so we use an external 4.5V reference.
 
 ### Software
 
