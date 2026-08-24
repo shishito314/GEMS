@@ -39,8 +39,8 @@ Then, with the current measurements, the computer will decide what should be dis
 Here are instructions for the full setup process:
 
 1. Install desired sensors on glovebox
-2. Set up router in lab with the given instructions (No need for WAN/Internet). Make sure router is on and network is available.
-3. Connect computer to router network with USB Wifi adapter (using an auxiliary wifi adapter to retain internet access, since the local router isn't connected to the internet).
+2. Connect computer to router network with USB Wifi adapter (here using an auxiliary wifi adapter to retain internet access, since the local router isn't connected to the internet). You may need to install the driver from the [TP-Link download center](https://www.tp-link.com/us/support/download/) (T3U Plus is the device).
+3. Set up router in lab with the given instructions. (No need for WAN/Internet, so you can skip it). Make sure router is on and network is available.
 4. Optionally, install [git](https://git-scm.com/install/) on the lab computer. This will allow for easier updates if changes are made to the GEMS github.
 5. If using git, clone the GEMS repository into the preferred filesystem location. On Mac and Windows, You can use the commands `cd your_folder_path` and then `git clone https://github.com/shishito314/GEMS.git`. You may need to sign in to your github.
 6. If not using git, you can download the repository manually (e.g. via zip)
@@ -55,9 +55,9 @@ Here are instructions for the full setup process:
 9. Install [Arduino IDE](https://www.arduino.cc/en/software/), either on a personal or lab computer. It's only needed for setup to upload code to the arduinos.
 10. Within Arduino IDE, go to the board manager and install the package for arduino megaAVR boards (like the Uno Wifi Rev2)
 11. Using the Library manager, install WiFiNINA and the Adafruit LED Backpack library, including all dependencies.
-12. Open the desired arduino ino sketch in Arduino IDE and go to config.h. Edit NETWORK_SSID and NETWORK_PASS to be correct for the room router. Save the file.
+12. Open the desired arduino sketch (.ino) in Arduino IDE and go to config.h. Edit NETWORK_SSID and NETWORK_PASS to be correct for the room router. Save the file.
 13. Upload the code using a printer cable (USB-B) with data capability (some only transmit power). When you plug in the arduino, click the dropdown in the top left and select the board, then click upload (right arrow icon). If the arduino doesn't appear in the dropdown, there's a chance that the cable doesn't transmit data or that you need to cycle power to the arduino.
-14. With arduino plugged in, open (or close and reopen) the serial monitor with the button in the top right to verify that it's working. You should see a couple prints and after ~10s, the arduino should connect to the router and print out the IP address it was assigned.
+14. With arduino plugged in, open (or close and reopen) the serial monitor with the button in the top right to verify that it's working. You should see a couple prints to the serial monitor and after ~10s, the arduino should connect to the router and print out the IP address it was assigned.
 15. Keeping the arduino plugged in (so we know the current IP address), bind the arduino MAC Address to the desired IP Address ([guide here](#binding-arduino-mac-adresses))
 16. Restart arduino (you can close and reopen the serial monitor) and verify that it gets the desired IP address after network connection.
 17. Connect the GEMS unit to the sensors via screw terminals and leads. Then using the wall mounted power adapter, plug in the PCB (not the arduino) to power. The PCB barrel jack is on the left side of the box, and the arduino's barrel jack (which can't handle this voltage) is on the top. Turn the unit on with the rocker switch (on = left down). The displays should come on after a few seconds.
@@ -88,7 +88,7 @@ In the current GEMS arduino code, the displays are set up as follows:
 
 ### Binding Arduino MAC Adresses
 
-1. Connect to the router network and go to the configuration page at [http://tplinkwifi.net/](http://tplinkwifi.net/). If your computer is connected to internet, you may need to try searching the router IP address directly (solution 2).
+1. Connect to the router network and go to the configuration page at [http://tplinkwifi.net/](http://tplinkwifi.net/) (Note the http, not https). If your computer is connected to internet, you may need to try searching the router IP address directly (solution 2).
 2. Sign in with admin password posted on the router
 3. Depending on how old your router is, there are different versions of the web page. Either:
    1. Click "Advanced," "Network," and "DHCP Server" (new version)
@@ -96,7 +96,7 @@ In the current GEMS arduino code, the displays are set up as follows:
 4. With the new version of the webpage, you should be able to scroll down and see the currently connected clients. If you know the IP address of the arduino from the serial monitor output, you can use that to identify its MAC address.
 5. Alternatively, you can get the arduino MAC address by temporarily uploading the getMacAddress sketch and reading the output from the serial monitor. You'll need to change the "ssid" and "pass" in the code to the network name and password. WARNING: depending on your library version, the printed MAC address might actually have the pairs of letters/numbers backwards (e.g. AB:CD:EF:12:34:56 is actually 56:34:12:EF:CD:AB).
 6. Add a new address reservation line on the router configuration page, and input the MAC Address with the desired IP Address. You can use `198.162.0.11_` as a possible naming scheme, just varying the last digit.
-7. Switch to "Enable" (old web page version)
+7. If on the old web page, switch address reservation to "Enable"
 
 ### Python Configuration
 
