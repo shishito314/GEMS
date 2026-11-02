@@ -1,5 +1,7 @@
 #pragma once
 // -------------------- Constants (Must Match Python) --------------------
+// NOTE: Using #define instead of const or constexpr to save memory (sounds dumb but makes a difference)
+
 // For HTTP Communication
 // NOTE: Make sure none of these flags are contained within the other flags, as it will mess up text parsing
 #define TEMP_FLAG "T<" //                                                                       MUST MATCH PYTHON
